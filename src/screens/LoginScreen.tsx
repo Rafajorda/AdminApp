@@ -8,8 +8,9 @@ import {
   Alert,
 } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { colors } from '../theme';
-import * as authService from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Pantalla de Login para administradores
@@ -27,6 +28,8 @@ export const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
 
   /**
    * Valida el formato del email
@@ -50,7 +53,7 @@ export const LoginScreen = () => {
 
   /**
    * Maneja el proceso de login
-   * Preparado para conectar con el backend
+   * Conectado con el backend NestJS
    */
   const handleLogin = async () => {
     // Validar campos
@@ -67,37 +70,22 @@ export const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      //  Descomentar para conectar con el backend
-      // const response = await authService.login({ email, password });
-      // 
-      // if (response.success && response.token) {
-      //   // Guardar token en AsyncStorage
-      //   // await AsyncStorage.setItem('token', response.token);
-      //   // Navegar a Dashboard
-      //   console.log('Login exitoso:', response.user);
-      // } else {
-      //   Alert.alert('Error', response.message || 'Credenciales inválidas');
-      // }
-
-      // Simulación
-      console.log('===== LOGIN ATTEMPT =====');
-      console.log('Email:', email);
-      console.log('Password:', password);
-      console.log('=========================');
+      // Llamada real al backend usando el contexto
+      await login(email, password);
       
-      // Simular delay de red
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('✅ Login exitoso, redirigiendo a dashboard...');
+      router.replace('/dashboard');
       
-      // Simular respuesta exitosa
-      console.log('✅ Login simulado exitoso');
-      Alert.alert('Login Exitoso', `Bienvenido ${email}`);
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error en login:', error);
-      Alert.alert(
-        'Error de conexión',
-        'No se pudo conectar con el servidor. Por favor, intenta de nuevo.'
-      );
+      
+      let errorMessage = 'No se pudo conectar con el servidor. Por favor, intenta de nuevo.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error de Login', errorMessage);
     } finally {
       setIsLoading(false);
     }
