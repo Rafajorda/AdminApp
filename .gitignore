@@ -42,3 +42,6 @@ yarn-error.*
 
 # reference code (old implementations)
 src/_reference/
+
+# Environment variables
+.env
