@@ -1,0 +1,21 @@
+{
+  "java.enabled": false,
+  "java.import.gradle.enabled": false,
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.expo/**",
+    "**/expo-modules/**"
+  ],
+  "java.project.sourcePaths": [],
+  "java.project.referencedLibraries": [],
+  "files.exclude": {
+    "**/.settings": true,
+    "**/.classpath": true,
+    "**/.project": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.expo/**": true
+  }
+}

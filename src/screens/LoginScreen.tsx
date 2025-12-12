@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
-import { useRouter } from 'expo-router';
 import { colors } from '../theme';
-import { useAuth } from '../contexts/AuthContext';
+import { useLoginForm } from '../hooks/useLoginForm';
 
 /**
  * Pantalla de Login para administradores
@@ -21,106 +19,23 @@ import { useAuth } from '../contexts/AuthContext';
  * - Diseño responsive con teclado
  * - Opción de "Olvidé mi contraseña"
  * - Estilo coherente con el tema de la app
+ * 
+ * Toda la lógica del formulario está encapsulada en useLoginForm
  */
 export const LoginScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
-  const router = useRouter();
-
-  /**
-   * Valida el formato del email
-   */
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  /**
-   * Maneja el cambio de email con validación
-   */
-  const handleEmailChange = (text: string) => {
-    setEmail(text);
-    if (text && !validateEmail(text)) {
-      setEmailError('Email inválido');
-    } else {
-      setEmailError('');
-    }
-  };
-
-  /**
-   * Maneja el proceso de login
-   * Conectado con el backend NestJS
-   */
-  const handleLogin = async () => {
-    // Validar campos
-    if (!email || !password) {
-      if (!email) setEmailError('El email es requerido');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setEmailError('Email inválido');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      // Llamada real al backend usando el contexto
-      await login(email, password);
-      
-      console.log('✅ Login exitoso, redirigiendo a dashboard...');
-      router.replace('/dashboard');
-      
-    } catch (error: any) {
-      console.error('❌ Error en login:', error);
-      
-      let errorMessage = 'No se pudo conectar con el servidor. Por favor, intenta de nuevo.';
-      
-      if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      Alert.alert('Error de Login', errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Maneja la recuperación de contraseña
-   */
-  const handleForgotPassword = async () => {
-    if (!email) {
-      Alert.alert('Email requerido', 'Por favor ingresa tu email primero');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setEmailError('Email inválido');
-      return;
-    }
-
-    try {
-      //  Descomentar para conectar con el backend)
-      // await authService.forgotPassword(email);
-      // Alert.alert('Email enviado', 'Revisa tu correo para restablecer tu contraseña');
-
-      // Simulación 
-      console.log('===== FORGOT PASSWORD =====');
-      console.log('Email:', email);
-      console.log('===========================');
-      Alert.alert('Email enviado', 'Revisa tu correo para restablecer tu contraseña (simulado)');
-      
-    } catch (error) {
-      console.error('Error en recuperación de contraseña:', error);
-      Alert.alert('Error', 'No se pudo procesar tu solicitud');
-    }
-  };
+  const {
+    email,
+    password,
+    showPassword,
+    emailError,
+    isLoading,
+    isFormValid,
+    setEmail,
+    setPassword,
+    setShowPassword,
+    handleLogin,
+    handleForgotPassword,
+  } = useLoginForm();
 
   return (
     <KeyboardAvoidingView
@@ -150,7 +65,7 @@ export const LoginScreen = () => {
           <TextInput
             label="Email"
             value={email}
-            onChangeText={handleEmailChange}
+            onChangeText={setEmail}
             mode="outlined"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -197,7 +112,7 @@ export const LoginScreen = () => {
             mode="contained"
             onPress={handleLogin}
             loading={isLoading}
-            disabled={isLoading || !email || !password || !!emailError}
+            disabled={isLoading || !isFormValid}
             style={styles.loginButton}
             contentStyle={styles.loginButtonContent}
             labelStyle={styles.loginButtonLabel}
