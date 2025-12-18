@@ -9,18 +9,36 @@ import { UserRole } from '../services/authService';
  * Componente interno que maneja la navegación protegida
  */
 function RootLayoutNav() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado pero NO es ADMIN
+    if (isLoading) return;
+
+    const inLoginPage = segments[0] === 'login' || !segments[0];
+
+    // Si no está autenticado y no está en login, redirigir a login
+    if (!isAuthenticated && !inLoginPage) {
+      console.log('[Guard] Not authenticated - redirecting to login');
+      router.replace('/login');
+      return;
+    }
+
+    // Si está autenticado pero no es ADMIN, cerrar sesión
     if (isAuthenticated && user && user.role !== UserRole.ADMIN) {
       console.log('[Guard] Usuario no es ADMIN, cerrando sesión automáticamente');
       logout();
-      router.replace('/');
+      router.replace('/login');
+      return;
     }
-  }, [isAuthenticated, user]);
+
+    // Si está autenticado y en la página de login, redirigir al dashboard
+    if (isAuthenticated && inLoginPage) {
+      console.log('[Guard] Already authenticated - redirecting to dashboard');
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, user, segments, isLoading]);
 
   return (
     <Stack

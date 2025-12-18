@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text, Button, Card, Avatar, Snackbar } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme';
 
@@ -11,6 +12,7 @@ import { colors } from '../theme';
  * Muestra información del usuario admin y opciones de gestión
  */
 export const DashboardScreen = () => {
+  const router = useRouter();
   const { user, logout } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -74,7 +76,7 @@ export const DashboardScreen = () => {
           <Card.Actions>
             <Button 
               mode="contained" 
-              onPress={() => console.log('Ir a productos')}
+              onPress={() => router.push('/products')}
               style={styles.optionButton}
             >
               Ver Productos

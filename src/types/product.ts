@@ -1,31 +1,27 @@
 /**
  * Tipos de producto
+ * 
+ * Re-exporta los tipos desde el schema de Zod
+ * para mantener compatibilidad con el código existente
  */
 
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  imageUrl?: string;
-  category: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+export type {
+  Product,
+  Category,
+  Color,
+  CreateProductInput,
+  UpdateProductInput,
+  ProductFilters,
+  ProductListResponse,
+} from '../schemas/product.schema';
 
-export interface ProductCategory {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-export interface CreateProductDto {
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  imageUrl?: string;
-}
+// Re-exportar schemas para validaciones
+export {
+  ProductSchema,
+  CategorySchema,
+  ColorSchema,
+  CreateProductSchema,
+  UpdateProductSchema,
+  ProductFiltersSchema,
+  ProductListResponseSchema,
+} from '../schemas/product.schema';

@@ -11,6 +11,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '../services/authService';
 import { User, UserRole } from '../services/authService';
+import { saveTokens } from '../services/tokenService';
 
 interface AuthContextType {
   user: User | null;
@@ -45,6 +46,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     loadUserData();
   }, []);
+
+  /**
+   * Verifica periódicamente si la sesión sigue válida
+   * Si el refresh token expiró, hace logout automático
+   */
+  useEffect(() => {
+    if (!user) return;
+
+    const checkSessionValidity = async () => {
+      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
+      
+      // Si no hay datos de usuario, la sesión expiró
+      if (!userData) {
+        console.log('[AuthContext] Session expired - logging out');
+        await clearAuthData();
+      }
+    };
+
+    // Verificar cada 30 segundos
+    const interval = setInterval(checkSessionValidity, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const loadUserData = async () => {
     try {
@@ -108,11 +132,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error('Acceso denegado. Solo administradores pueden acceder a esta aplicación.');
       }
 
-      // Guardar tokens, datos de usuario y timestamp del login
+      // Guardar tokens usando tokenService (incluye timestamp de expiración)
+      await saveTokens({
+        access_token: response.access_token,
+        refresh_token: response.refresh_token,
+        expires_in: response.expires_in || 900,
+        access_token_expires_at: response.access_token_expires_at || Date.now() + 900000,
+        refresh_token_expires_at: response.refresh_token_expires_at || Date.now() + 86400000,
+      });
+
+      // Guardar datos de usuario y timestamp del login
       const now = new Date().toISOString();
       await Promise.all([
-        AsyncStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, response.access_token),
-        AsyncStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token),
         AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user)),
         AsyncStorage.setItem(STORAGE_KEYS.LAST_LOGIN, now),
       ]);
