@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text, Button, Card, Avatar, Snackbar } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme';
 
@@ -13,13 +13,18 @@ import { colors } from '../theme';
  */
 export const DashboardScreen = () => {
   const router = useRouter();
+  const { fromLogin } = useLocalSearchParams();
   const { user, logout } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
 
-  // Mostrar mensaje de bienvenida al entrar
+  // Mostrar mensaje de bienvenida solo cuando viene desde login
   useEffect(() => {
-    setShowWelcome(true);
-  }, []);
+    if (fromLogin === 'true') {
+      setShowWelcome(true);
+      // Limpiar el parámetro de la URL
+      router.replace('/dashboard');
+    }
+  }, [fromLogin]);
 
   const handleLogout = async () => {
     try {
@@ -122,24 +127,6 @@ export const DashboardScreen = () => {
 
         <Card style={styles.optionCard}>
           <Card.Content>
-            <Text variant="titleMedium">⚙️ Configuración</Text>
-            <Text variant="bodyMedium" style={styles.optionDescription}>
-              Ajustes de la aplicación
-            </Text>
-          </Card.Content>
-          <Card.Actions>
-            <Button 
-              mode="contained" 
-              onPress={() => console.log('Ir a configuración')}
-              style={styles.optionButton}
-            >
-              Configuración
-            </Button>
-          </Card.Actions>
-        </Card>
-
-        <Card style={styles.optionCard}>
-          <Card.Content>
             <Text variant="titleMedium">🏷️ Entidades</Text>
             <Text variant="bodyMedium" style={styles.optionDescription}>
               Gestiona categorías, colores y más
@@ -152,6 +139,24 @@ export const DashboardScreen = () => {
               style={styles.optionButton}
             >
               Ver Entidades
+            </Button>
+          </Card.Actions>
+        </Card>
+
+        <Card style={styles.optionCard}>
+          <Card.Content>
+            <Text variant="titleMedium">⚙️ Configuración</Text>
+            <Text variant="bodyMedium" style={styles.optionDescription}>
+              Ajustes de la aplicación
+            </Text>
+          </Card.Content>
+          <Card.Actions>
+            <Button 
+              mode="contained" 
+              onPress={() => console.log('Ir a configuración')}
+              style={styles.optionButton}
+            >
+              Configuración
             </Button>
           </Card.Actions>
         </Card>

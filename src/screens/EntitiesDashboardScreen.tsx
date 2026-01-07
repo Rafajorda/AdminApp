@@ -1,12 +1,36 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { SegmentedButtons, Appbar } from 'react-native-paper';
+import { useRouter } from 'expo-router';
+import { CategoryManager } from '../components/CategoryManager';
+import { ColorManager } from '../components/ColorManager';
+import { colors } from '../theme';
 
 const EntitiesDashboardScreen = () => {
+  const [selectedEntity, setSelectedEntity] = useState('categories');
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Gestión de entidades</Text>
-      <Text>Categorías, colores y otras entidades no producto.</Text>
-      {/* Aquí se pueden añadir enlaces o componentes para gestionar cada entidad */}
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => router.push('/dashboard')} />
+        <Appbar.Content title="Gestión de Entidades" />
+      </Appbar.Header>
+
+      <SegmentedButtons
+        value={selectedEntity}
+        onValueChange={setSelectedEntity}
+        buttons={[
+          { value: 'categories', label: 'Categorías' },
+          { value: 'colors', label: 'Colores' },
+        ]}
+        style={styles.segmentedButtons}
+      />
+
+      <ScrollView style={styles.content}>
+        {selectedEntity === 'categories' && <CategoryManager />}
+        {selectedEntity === 'colors' && <ColorManager />}
+      </ScrollView>
     </View>
   );
 };
@@ -14,14 +38,14 @@ const EntitiesDashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
+    backgroundColor: colors.light.background,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+  segmentedButtons: {
+    margin: 16,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
 });
 

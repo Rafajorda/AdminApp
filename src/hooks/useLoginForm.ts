@@ -57,7 +57,7 @@ export const useLoginForm = () => {
     try {
       await login(email, password);
       console.log('✅ Login exitoso, redirigiendo a dashboard...');
-      router.replace('/dashboard');
+      router.replace('/dashboard?fromLogin=true');
     } catch (error: any) {
       console.error('❌ Error en login:', error);
       
