@@ -137,6 +137,24 @@ export const DashboardScreen = () => {
             </Button>
           </Card.Actions>
         </Card>
+
+        <Card style={styles.optionCard}>
+          <Card.Content>
+            <Text variant="titleMedium">🏷️ Entidades</Text>
+            <Text variant="bodyMedium" style={styles.optionDescription}>
+              Gestiona categorías, colores y más
+            </Text>
+          </Card.Content>
+          <Card.Actions>
+            <Button 
+              mode="contained" 
+              onPress={() => router.push('/entities-dashboard')}
+              style={styles.optionButton}
+            >
+              Ver Entidades
+            </Button>
+          </Card.Actions>
+        </Card>
       </View>
 
       {/* Botón de cerrar sesión */}
