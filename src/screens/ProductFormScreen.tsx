@@ -23,6 +23,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useProductForm } from '../hooks/useProductForm';
+import { colors } from '../theme';
 
 interface ProductFormScreenProps {
   productId?: string;
@@ -148,7 +149,11 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
               key={category.id}
               selected={formData.categoryIds.includes(category.id)}
               onPress={() => handleCategoryToggle(category.id)}
-              style={styles.chip}
+              style={[
+                styles.chip,
+                formData.categoryIds.includes(category.id) && styles.chipSelected,
+              ]}
+              textStyle={formData.categoryIds.includes(category.id) && styles.chipSelectedText}
               mode="outlined"
             >
               {category.name}
@@ -172,7 +177,11 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
               key={color.id}
               selected={formData.colorIds.includes(color.id)}
               onPress={() => handleColorToggle(color.id)}
-              style={styles.chip}
+              style={[
+                styles.chip,
+                formData.colorIds.includes(color.id) && styles.chipSelected,
+              ]}
+              textStyle={formData.colorIds.includes(color.id) && styles.chipSelectedText}
               mode="outlined"
               avatar={
                 color.hexCode ? (
@@ -263,7 +272,7 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.light.background,
   },
   scrollContent: {
     padding: 16,
@@ -285,6 +294,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 4,
+    backgroundColor: colors.light.surface,
   },
   divider: {
     marginVertical: 20,
@@ -298,12 +308,18 @@ const styles = StyleSheet.create({
   chip: {
     marginBottom: 4,
   },
+  chipSelected: {
+    backgroundColor: colors.light.primary,
+  },
+  chipSelectedText: {
+    color: colors.light.surface,
+  },
   colorDot: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 2,
+    borderColor: colors.light.primary,
   },
   errorText: {
     fontSize: 14,

@@ -10,19 +10,18 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import {
-  Text,
-  Card,
-  Button,
-  Searchbar,
   FAB,
-  IconButton,
-  Chip,
   ActivityIndicator,
+  Appbar,
+  Button,
+  Text,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { colors } from '../theme';
 import { useProducts } from '../hooks/useProducts';
 import { Product } from '../types/product';
+import { ProductCard, ProductListHeader } from '../components/products';
 
 export const ProductsDashboardScreen = () => {
   const router = useRouter();
@@ -39,6 +38,15 @@ export const ProductsDashboardScreen = () => {
   } = useProducts();
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  /**
+   * Refresca la lista cuando la pantalla obtiene el foco
+   */
+  useFocusEffect(
+    React.useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
 
   /**
    * Maneja la búsqueda de productos
@@ -89,93 +97,12 @@ export const ProductsDashboardScreen = () => {
    * Renderiza cada producto en la lista
    */
   const renderProduct = ({ item }: { item: Product }) => (
-    <Card style={styles.productCard}>
-      <Card.Content>
-        <View style={styles.productHeader}>
-          <View style={styles.productInfo}>
-            <Text variant="titleMedium" style={styles.productName}>
-              {item.name}
-            </Text>
-            <Text variant="bodySmall" style={styles.productMaterial}>
-              {item.material}
-            </Text>
-          </View>
-          <Chip
-            mode="flat"
-            style={[
-              styles.statusChip,
-              item.status === 'active' ? styles.activeChip : styles.inactiveChip,
-            ]}
-            textStyle={styles.chipText}
-          >
-            {item.status === 'active' ? 'Activo' : 'Inactivo'}
-          </Chip>
-        </View>
-
-        <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>
-          {item.description}
-        </Text>
-
-        <View style={styles.productDetails}>
-          <Text variant="titleLarge" style={styles.price}>
-            €{item.price.toFixed(2)}
-          </Text>
-          {item.dimensions && (
-            <Text variant="bodySmall" style={styles.dimensions}>
-              📏 {item.dimensions}
-            </Text>
-          )}
-        </View>
-
-        {/* Categorías */}
-        {item.categories.length > 0 && (
-          <View style={styles.categoriesContainer}>
-            {item.categories.map((category) => (
-              <Chip
-                key={category.id}
-                compact
-                style={styles.categoryChip}
-                textStyle={styles.categoryText}
-              >
-                {category.name}
-              </Chip>
-            ))}
-          </View>
-        )}
-
-        {/* Colores */}
-        {item.colors && item.colors.length > 0 && (
-          <View style={styles.colorsContainer}>
-            {item.colors.map((color) => color && color.id && (
-              <View
-                key={color.id}
-                style={[styles.colorDot, { backgroundColor: color.hexCode || '#CCCCCC' }]}
-              />
-            ))}
-          </View>
-        )}
-
-        {/* Acciones */}
-        <View style={styles.actions}>
-          <IconButton
-            icon="pencil"
-            size={20}
-            onPress={() => handleEditProduct(item.id)}
-          />
-          <IconButton
-            icon={item.status === 'active' ? 'eye-off' : 'eye'}
-            size={20}
-            onPress={() => handleToggleStatus(item.id)}
-          />
-          <IconButton
-            icon="delete"
-            size={20}
-            iconColor={colors.light.error}
-            onPress={() => handleDeleteProduct(item.id, item.name)}
-          />
-        </View>
-      </Card.Content>
-    </Card>
+    <ProductCard
+      product={item}
+      onEdit={handleEditProduct}
+      onToggleStatus={handleToggleStatus}
+      onDelete={handleDeleteProduct}
+    />
   );
 
   /**
@@ -220,22 +147,17 @@ export const ProductsDashboardScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header con búsqueda */}
-      <View style={styles.header}>
-        <Text variant="headlineMedium" style={styles.title}>
-          Productos
-        </Text>
-        <Text variant="bodySmall" style={styles.subtitle}>
-          {pagination.total} productos totales
-        </Text>
-      </View>
+      {/* Appbar */}
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.Content title="Productos" />
+      </Appbar.Header>
 
-      {/* Barra de búsqueda */}
-      <Searchbar
-        placeholder="Buscar productos..."
-        onChangeText={handleSearch}
-        value={searchQuery}
-        style={styles.searchbar}
+      {/* Header con búsqueda y contador */}
+      <ProductListHeader
+        searchQuery={searchQuery}
+        onSearchChange={handleSearch}
+        totalCount={pagination.total}
       />
 
       {/* Lista de productos */}
@@ -267,110 +189,11 @@ export const ProductsDashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
-  },
-  header: {
-    padding: 16,
-    paddingBottom: 8,
-  },
-  title: {
-    fontWeight: 'bold',
-    color: colors.light.text,
-  },
-  subtitle: {
-    color: colors.light.textSecondary,
-    marginTop: 4,
-  },
-  searchbar: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    backgroundColor: colors.light.surface,
+    backgroundColor: colors.light.background, // Arena suave
   },
   listContent: {
     padding: 16,
     paddingBottom: 80,
-  },
-  productCard: {
-    marginBottom: 12,
-    backgroundColor: colors.light.surface,
-  },
-  productHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  productInfo: {
-    flex: 1,
-    marginRight: 8,
-  },
-  productName: {
-    fontWeight: 'bold',
-    color: colors.light.text,
-  },
-  productMaterial: {
-    color: colors.light.textSecondary,
-    marginTop: 2,
-  },
-  statusChip: {
-    height: 28,
-  },
-  activeChip: {
-    backgroundColor: '#E8F5E9',
-  },
-  inactiveChip: {
-    backgroundColor: '#FFEBEE',
-  },
-  chipText: {
-    fontSize: 12,
-  },
-  description: {
-    color: colors.light.textSecondary,
-    marginBottom: 12,
-  },
-  productDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  price: {
-    fontWeight: 'bold',
-    color: colors.light.primary,
-  },
-  dimensions: {
-    color: colors.light.textSecondary,
-  },
-  categoriesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
-  categoryChip: {
-    height: 26,
-    backgroundColor: colors.light.secondary,
-  },
-  categoryText: {
-    fontSize: 11,
-  },
-  colorsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
-  },
-  colorDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 8,
-    marginRight: -8,
   },
   footerLoader: {
     paddingVertical: 20,
