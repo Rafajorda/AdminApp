@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Text, TextInput, Button, SegmentedButtons, Appbar, ActivityIndicator } from 'react-native-paper';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Button, Appbar, ActivityIndicator } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { User, CreateUserDto, UpdateUserDto, UserRole } from '../types/user';
+import { CreateUserDto, UpdateUserDto, UserRole } from '../types/user';
 import { getUserById, createUser, updateUser } from '../services/userService';
 import { useAuthStore } from '../stores/authStore';
 import { colors } from '../theme';
+import { UserFormFields, UserRoleSelector, AvatarPreview } from '../components/users';
 
 const UserFormScreen = () => {
   const router = useRouter();
@@ -46,7 +47,7 @@ const UserFormScreen = () => {
         address: user.address || '',
         avatar: user.avatar || '',
         role: user.role,
-        password: '', // No mostrar contraseña
+        password: '',
       });
     } catch (error) {
       console.error('Error loading user:', error);
@@ -55,6 +56,17 @@ const UserFormScreen = () => {
     } finally {
       setInitialLoading(false);
     }
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
+    }
+  };
+
+  const handleRoleChange = (role: UserRole) => {
+    setFormData({ ...formData, role });
   };
 
   const validateForm = (): boolean => {
@@ -67,13 +79,11 @@ const UserFormScreen = () => {
     if (!formData.email?.trim()) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
+      newErrors.email = 'El email no es válido';
     }
 
     if (!isEditing && !(formData as CreateUserDto).password) {
-      newErrors.password = 'La contraseña es requerida para crear un usuario';
-    } else if ((formData as CreateUserDto).password && (formData as CreateUserDto).password!.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+      newErrors.password = 'La contraseña es requerida';
     }
 
     setErrors(newErrors);
@@ -140,111 +150,21 @@ const UserFormScreen = () => {
       </Appbar.Header>
 
       <ScrollView style={styles.content}>
-        {/* Avatar preview */}
-        {formData.avatar && (
-          <View style={styles.avatarContainer}>
-            <Image
-              source={{ uri: formData.avatar }}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
-          </View>
-        )}
+        <AvatarPreview avatarUrl={formData.avatar} />
 
-        {/* Campos del formulario */}
-        <TextInput
-          label="Nombre de usuario *"
-          value={formData.username}
-          onChangeText={(text) => setFormData({ ...formData, username: text })}
-          mode="outlined"
-          style={styles.input}
-          error={!!errors.username}
-        />
-        {errors.username && (
-          <Text style={styles.errorText}>{errors.username}</Text>
-        )}
-
-        <TextInput
-          label="Email *"
-          value={formData.email}
-          onChangeText={(text) => setFormData({ ...formData, email: text })}
-          mode="outlined"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          style={styles.input}
-          error={!!errors.email}
-        />
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        )}
-
-        <TextInput
-          label={isEditing ? "Contraseña (dejar vacío para no cambiar)" : "Contraseña *"}
-          value={(formData as CreateUserDto).password || ''}
-          onChangeText={(text) => setFormData({ ...formData, password: text })}
-          mode="outlined"
-          secureTextEntry
-          style={styles.input}
-          error={!!errors.password}
-        />
-        {errors.password && (
-          <Text style={styles.errorText}>{errors.password}</Text>
-        )}
-
-        <TextInput
-          label="Nombre"
-          value={formData.firstName || ''}
-          onChangeText={(text) => setFormData({ ...formData, firstName: text })}
-          mode="outlined"
-          style={styles.input}
+        <UserFormFields
+          formData={formData}
+          errors={errors}
+          isEditing={isEditing}
+          onFieldChange={handleFieldChange}
         />
 
-        <TextInput
-          label="Apellido"
-          value={formData.lastName || ''}
-          onChangeText={(text) => setFormData({ ...formData, lastName: text })}
-          mode="outlined"
-          style={styles.input}
+        <UserRoleSelector
+          role={formData.role || UserRole.USER}
+          isEditingSelf={!!isEditingSelf}
+          onRoleChange={handleRoleChange}
         />
 
-        <TextInput
-          label="Dirección"
-          value={formData.address || ''}
-          onChangeText={(text) => setFormData({ ...formData, address: text })}
-          mode="outlined"
-          multiline
-          numberOfLines={2}
-          style={styles.input}
-        />
-
-        <TextInput
-          label="URL del Avatar"
-          value={formData.avatar || ''}
-          onChangeText={(text) => setFormData({ ...formData, avatar: text })}
-          mode="outlined"
-          autoCapitalize="none"
-          style={styles.input}
-          placeholder="https://ejemplo.com/avatar.jpg"
-        />
-
-        {/* Selector de rol */}
-        <Text variant="titleSmall" style={styles.sectionTitle}>Rol del usuario</Text>
-        {isEditingSelf && (
-          <Text style={styles.warningText}>
-            ℹ️ No puedes cambiar tu propio rol
-          </Text>
-        )}
-        <SegmentedButtons
-          value={formData.role || UserRole.USER}
-          onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
-          buttons={[
-            { value: UserRole.USER, label: 'Usuario', disabled: !!isEditingSelf },
-            { value: UserRole.ADMIN, label: 'Administrador', disabled: !!isEditingSelf },
-          ]}
-          style={styles.segmentedButtons}
-        />
-
-        {/* Botones de acción */}
         <View style={styles.actions}>
           <Button
             mode="outlined"
@@ -274,48 +194,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light.background,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   content: {
     flex: 1,
     padding: 16,
   },
-  avatarContainer: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#e0e0e0',
-  },
-  input: {
-    marginBottom: 12,
-  },
-  errorText: {
-    color: colors.light.error,
-    fontSize: 12,
-    marginTop: -8,
-    marginBottom: 8,
-    marginLeft: 12,
-  },
-  sectionTitle: {
-    marginTop: 8,
-    marginBottom: 12,
-    fontWeight: 'bold',
-  },
-  warningText: {
-    color: colors.light.primary,
-    fontSize: 12,
-    marginBottom: 8,
-    fontStyle: 'italic',
-  },
-  segmentedButtons: {
-    marginBottom: 24,
   },
   actions: {
     flexDirection: 'row',
@@ -328,6 +214,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
+    backgroundColor: colors.light.primary,
   },
 });
 

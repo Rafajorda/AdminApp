@@ -212,12 +212,16 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
       
       if (err.name === 'ZodError') {
         const errors: Record<string, string> = {};
+        console.log('[useProductForm] Validation errors:', err.errors);
         err.errors.forEach((error: any) => {
           const field = error.path[0];
           errors[field] = error.message;
+          console.log(`[useProductForm] Field error - ${field}:`, error.message);
         });
         setFieldErrors(errors);
-        setError('Por favor corrige los errores en el formulario');
+        // Crear mensaje más descriptivo con los campos que tienen error
+        const errorFields = Object.keys(errors).join(', ');
+        setError(`Por favor corrige los errores en: ${errorFields}`);
       } else {
         if (err.message?.includes('sesión ha expirado')) {
           setError(err.message);

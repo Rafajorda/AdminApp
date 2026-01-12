@@ -64,10 +64,10 @@ export const CreateProductSchema = z.object({
   description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres').max(500),
   material: z.string().min(2, 'El material debe tener al menos 2 caracteres').max(50),
   price: z.number().positive('El precio debe ser mayor a 0').max(999999.99),
-  dimensions: z.string().optional().nullable(),
-  // Campos de imagen (opcional)
-  imageUrl: z.string().url('Debe ser una URL válida').optional().nullable(),
-  imageAlt: z.string().min(3, 'La descripción debe tener al menos 3 caracteres').optional().nullable(),
+  dimensions: z.string().optional().or(z.literal('')).nullable(),
+  // Campos de imagen (completamente opcionales)
+  imageUrl: z.string().url('Debe ser una URL válida').optional().or(z.literal('')).nullable(),
+  imageAlt: z.string().optional().or(z.literal('')).nullable(),
   categoryIds: z.array(z.string().uuid()).min(1, 'Debe seleccionar al menos una categoría'),
   colorIds: z.array(z.string().uuid()).min(1, 'Debe seleccionar al menos un color'),
 });
