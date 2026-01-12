@@ -4,12 +4,12 @@ import { Text, IconButton, Portal, Dialog, Chip, Button, Searchbar, FAB } from '
 import { useRouter } from 'expo-router';
 import { User, UserRole } from '../types/user';
 import { getUsers, toggleUserStatus, deleteUser, PaginatedResponse } from '../services/userService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { colors } from '../theme';
 
 export const UserManager = () => {
   const router = useRouter();
-  const { user: currentUser } = useAuth();
+  const currentUser = useAuthStore((state) => state.user);
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);

@@ -4,13 +4,13 @@ import { Text, TextInput, Button, SegmentedButtons, Appbar, ActivityIndicator } 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { User, CreateUserDto, UpdateUserDto, UserRole } from '../types/user';
 import { getUserById, createUser, updateUser } from '../services/userService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { colors } from '../theme';
 
 const UserFormScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const { user: currentUser } = useAuth();
+  const currentUser = useAuthStore((state) => state.user);
   const isEditing = !!id;
   const isEditingSelf = isEditing && currentUser && parseInt(id!) === currentUser.id;
 
