@@ -99,7 +99,7 @@ export const DashboardScreen = () => {
           <Card.Actions>
             <Button 
               mode="contained" 
-              onPress={() => console.log('Ir a usuarios')}
+              onPress={() => router.push('/users-dashboard')}
               style={styles.optionButton}
             >
               Ver Usuarios
