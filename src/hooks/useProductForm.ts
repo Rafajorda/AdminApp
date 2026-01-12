@@ -196,7 +196,9 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
       if (isEditMode && productId) {
         // Modo edición: validar con UpdateProductSchema
         const validatedData = UpdateProductSchema.parse({ id: productId, ...formData });
-        await updateProduct(productId, validatedData);
+        // Eliminar el id del payload ya que va en la URL
+        const { id, ...dataWithoutId } = validatedData;
+        await updateProduct(productId, dataWithoutId);
       } else {
         // Modo creación: validar con CreateProductSchema
         const validatedData = CreateProductSchema.parse(formData);
