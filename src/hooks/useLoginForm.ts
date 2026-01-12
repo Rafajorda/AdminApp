@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { validateEmail, getEmailError } from '../utils/validations';
 
 export const useLoginForm = () => {
@@ -21,7 +21,7 @@ export const useLoginForm = () => {
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login } = useAuth();
+  const login = useAuthStore((state) => state.login);
   const router = useRouter();
 
   /**

@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { DashboardScreen } from '../screens/DashboardScreen';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { UserRole } from '../services/authService';
 
 /**
@@ -8,7 +8,7 @@ import { UserRole } from '../services/authService';
  * Protegida: Si no está autenticado o no es ADMIN, redirige a /login
  */
 export default function Dashboard() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
 
   if (isLoading) {
     return null;

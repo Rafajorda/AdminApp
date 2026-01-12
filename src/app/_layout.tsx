@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
-import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { lightTheme } from '../theme';
 import { UserRole } from '../services/authService';
 
@@ -9,7 +9,7 @@ import { UserRole } from '../services/authService';
  * Componente interno que maneja la navegación protegida
  */
 function RootLayoutNav() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
 
@@ -58,11 +58,23 @@ function RootLayoutNav() {
  * Configura los providers globales y el Stack Navigator
  */
 export default function RootLayout() {
+  const loadUserData = useAuthStore((state) => state.loadUserData);
+
+  // Cargar datos del usuario al iniciar la app
+  useEffect(() => {
+    loadUserData();
+
+    // Verificar validez de sesión cada 30 segundos
+    const interval = setInterval(() => {
+      useAuthStore.getState().checkSessionValidity();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <AuthProvider>
-      <PaperProvider theme={lightTheme}>
-        <RootLayoutNav />
-      </PaperProvider>
-    </AuthProvider>
+    <PaperProvider theme={lightTheme}>
+      <RootLayoutNav />
+    </PaperProvider>
   );
 }

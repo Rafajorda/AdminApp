@@ -1,13 +1,13 @@
 import { Redirect } from 'expo-router';
 import { LoginScreen } from '../screens/LoginScreen';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 
 /**
  * Ruta /login
  * Si ya está autenticado, redirige al dashboard
  */
 export default function Login() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   if (isLoading) {
     return null;

@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 import { lightTheme } from '../theme';
 
 /**
@@ -8,7 +8,7 @@ import { lightTheme } from '../theme';
  * Redirige a /dashboard si está autenticado, sino a /login
  */
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthStore();
 
   if (isLoading) {
     return (
