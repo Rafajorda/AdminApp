@@ -28,8 +28,8 @@ export const LoginHeader = () => {
 const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
-    marginBottom: 32,
-  },
+    marginBottom: 32,    width: '100%',
+    maxWidth: 400,  },
   logoContainer: {
     width: 100,
     height: 100,

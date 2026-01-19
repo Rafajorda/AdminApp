@@ -5,10 +5,12 @@
  * - Lista con búsqueda y filtros
  * - Crear, editar, eliminar productos
  * - Cambiar estado (activo/inactivo)
+ * - Generar etiquetas con QR
+ * - Escanear QR para buscar productos
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, Modal } from 'react-native';
 import {
   FAB,
   ActivityIndicator,
@@ -21,7 +23,7 @@ import { useFocusEffect } from 'expo-router';
 import { colors } from '../theme';
 import { useProducts } from '../hooks/useProducts';
 import { Product } from '../types/product';
-import { ProductCard, ProductListHeader } from '../components/products';
+import { ProductCard, ProductListHeader, ProductLabel, QRScanner } from '../components/products';
 
 export const ProductsDashboardScreen = () => {
   const router = useRouter();
@@ -38,6 +40,8 @@ export const ProductsDashboardScreen = () => {
   } = useProducts();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
 
   /**
    * Refresca la lista cuando la pantalla obtiene el foco
@@ -94,6 +98,34 @@ export const ProductsDashboardScreen = () => {
   };
 
   /**
+   * Abre el modal de etiqueta del producto
+   */
+  const handleGenerateLabel = (product: Product) => {
+    setSelectedProduct(product);
+  };
+
+  /**
+   * Cierra el modal de etiqueta
+   */
+  const handleCloseLabelModal = () => {
+    setSelectedProduct(null);
+  };
+
+  /**
+   * Abre el escáner de QR
+   */
+  const handleOpenScanner = () => {
+    setShowScanner(true);
+  };
+
+  /**
+   * Cierra el escáner de QR
+   */
+  const handleCloseScanner = () => {
+    setShowScanner(false);
+  };
+
+  /**
    * Renderiza cada producto en la lista
    */
   const renderProduct = ({ item }: { item: Product }) => (
@@ -102,6 +134,7 @@ export const ProductsDashboardScreen = () => {
       onEdit={handleEditProduct}
       onToggleStatus={handleToggleStatus}
       onDelete={handleDeleteProduct}
+      onGenerateLabel={handleGenerateLabel}
     />
   );
 
@@ -151,6 +184,7 @@ export const ProductsDashboardScreen = () => {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Productos" />
+        <Appbar.Action icon="qrcode-scan" onPress={handleOpenScanner} />
       </Appbar.Header>
 
       {/* Header con búsqueda y contador */}
@@ -182,6 +216,30 @@ export const ProductsDashboardScreen = () => {
         onPress={handleCreateProduct}
         label="Nuevo Producto"
       />
+
+      {/* Modal de etiqueta del producto */}
+      <Modal
+        visible={!!selectedProduct}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCloseLabelModal}
+      >
+        {selectedProduct && (
+          <ProductLabel
+            product={selectedProduct}
+            onClose={handleCloseLabelModal}
+          />
+        )}
+      </Modal>
+
+      {/* Modal de escáner QR */}
+      <Modal
+        visible={showScanner}
+        animationType="slide"
+        onRequestClose={handleCloseScanner}
+      >
+        <QRScanner onClose={handleCloseScanner} />
+      </Modal>
     </View>
   );
 };

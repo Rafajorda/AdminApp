@@ -103,6 +103,7 @@ export const LoginForm = ({
 const styles = StyleSheet.create({
   form: {
     width: '100%',
+    maxWidth: 400,
   },
   input: {
     marginBottom: 4,
