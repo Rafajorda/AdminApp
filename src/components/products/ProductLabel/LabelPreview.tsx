@@ -1,0 +1,88 @@
+/**
+ * LabelPreview
+ * 
+ * Vista previa de la etiqueta con QR y datos del producto
+ */
+
+import React, { forwardRef } from 'react';
+import { View, Text } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
+import ViewShot from 'react-native-view-shot';
+import { Product } from '../../../types/product';
+import { styles } from './LabelPreview.styles';
+
+interface LabelPreviewProps {
+  product: Product;
+  selectedColors: string[];
+  productUrl: string;
+}
+
+export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
+  ({ product, selectedColors, productUrl }, ref) => {
+    return (
+      <ViewShot
+        ref={ref}
+        options={{ format: 'png', quality: 1.0 }}
+        style={styles.container}
+      >
+        <View style={styles.label}>
+          {/* Código QR (izquierda) */}
+          <View style={styles.qrSection}>
+            <QRCode
+              value={productUrl}
+              size={130}
+              backgroundColor="white"
+            />
+          </View>
+
+          {/* Información del producto (derecha) */}
+          <View style={styles.infoSection}>
+            {/* Nombre arriba */}
+            <Text style={styles.productName} numberOfLines={2}>
+              {product.name}
+            </Text>
+
+            {/* Precio en grande en medio */}
+            <Text style={styles.productPrice}>
+              ${product.price.toFixed(2)}
+            </Text>
+
+            {/* Descripción */}
+            {product.description && (
+              <Text style={styles.productDescription} numberOfLines={2}>
+                {product.description}
+              </Text>
+            )}
+
+            {/* Tamaño */}
+            {product.dimensions && (
+              <Text style={styles.productDetails}>
+                Tamaño: {product.dimensions}
+              </Text>
+            )}
+
+            {/* Colores con círculos */}
+            {product.colors && product.colors.length > 0 && (
+              <View style={styles.colorsSection}>
+                <Text style={styles.colorsLabel}>Colores:</Text>
+                <View style={styles.colorCircles}>
+                  {product.colors.map((color) => (
+                    <View key={color.id} style={styles.colorCircleItem}>
+                      <View style={[
+                        styles.colorCircle,
+                        selectedColors.includes(color.name) && styles.colorCircleSelected
+                      ]} />
+                      <Text style={styles.colorName}>{color.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </ViewShot>
+    );
+  }
+);
+
+LabelPreview.displayName = 'LabelPreview';
