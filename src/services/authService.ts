@@ -9,14 +9,14 @@ import { Platform } from 'react-native';
 
 /**
  * Cambia la URL en .env según donde estés:
- * - Clase (WiFi Conselleria): http://10.250.79.59:3000
+ * - Clase (WiFi Conselleria): http://10.250.77.96:3000
  * - Casa: http://192.168.1.X:3000 (sustituir X por tu IP)
  * - Local (desarrollo web): http://localhost:3000
  */
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 
   (Platform.OS === 'web' 
     ? 'http://localhost:3000' 
-    : 'http://10.250.79.59:3000'); // Cambiar esta IP según la red
+    : 'http://10.250.77.96:3000'); // IP actualizada de tu PC
 
 
 export interface LoginCredentials {
@@ -55,9 +55,13 @@ export interface LoginResponse {
  */
 export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
   try {
-    console.log('[AuthService] Intentando login...', credentials.email);
+    const url = `${API_BASE_URL}/auth/login`;
+    console.log('[AuthService] Intentando login...');
+    console.log('[AuthService] URL:', url);
+    console.log('[AuthService] Email:', credentials.email);
+    console.log('[AuthService] Platform:', Platform.OS);
     
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

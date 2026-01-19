@@ -14,7 +14,7 @@ import { getValidAccessToken } from './tokenService';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 
   (Platform.OS === 'web' 
     ? 'http://localhost:3000' 
-    : 'http://10.250.79.59:3000');
+    : 'http://10.250.77.96:3000');
 
 /**
  * Headers comunes para las peticiones
