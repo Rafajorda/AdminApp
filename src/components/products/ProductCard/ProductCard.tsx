@@ -40,7 +40,7 @@ export const ProductCard = ({ product, onEdit, onToggleStatus, onDelete, onGener
               {product.name}
             </Text>
             <Text variant="bodySmall" style={styles.material}>
-              {product.material} • €{product.price.toFixed(2)}
+              {product.material} • €{Number(product.price).toFixed(2)}
             </Text>
           </View>
           <View style={styles.headerRight}>
