@@ -1,52 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, Alert } from 'react-native';
 import { Text, Button, TextInput, Card, IconButton, Portal, Dialog } from 'react-native-paper';
 import { Category, CreateCategoryDto } from '../../types/category';
-import { getCategories, createCategory, updateCategory, deleteCategory, toggleCategoryStatus } from '../../services/categoryService';import { colors } from '../../theme';import { styles } from './CategoryManager.styles';
+import {
+  useCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useToggleCategoryStatusMutation,
+} from '../../hooks/queries';
+import { colors } from '../../theme';
+import { styles } from './CategoryManager.styles';
 
 export const CategoryManager = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: categories = [], isLoading: loadingCategories } = useCategoriesQuery();
+  const createMutation = useCreateCategoryMutation();
+  const updateMutation = useUpdateCategoryMutation();
+  const deleteMutation = useDeleteCategoryMutation();
+  const toggleStatusMutation = useToggleCategoryStatusMutation();
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateCategoryDto>({ name: '' });
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const data = await getCategories();
-      setCategories(data);
-    } catch (error) {
-      console.error('Error loading categories:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = loadingCategories || 
+    createMutation.isPending || 
+    updateMutation.isPending || 
+    deleteMutation.isPending || 
+    toggleStatusMutation.isPending;
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) return;
 
     try {
-      setLoading(true);
       if (isEditing && editingId) {
-        await updateCategory(editingId, formData);
+        await updateMutation.mutateAsync({ id: editingId, data: formData });
       } else {
-        await createCategory(formData);
+        await createMutation.mutateAsync(formData);
       }
       setFormData({ name: '' });
       setIsEditing(false);
       setEditingId(null);
-      await loadCategories();
-    } catch (error) {
-      console.error('Error saving category:', error);
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Error al guardar la categoría');
     }
   };
 
@@ -71,27 +69,19 @@ export const CategoryManager = () => {
     if (!categoryToDelete) return;
 
     try {
-      setLoading(true);
-      await deleteCategory(categoryToDelete);
-      await loadCategories();
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    } finally {
-      setLoading(false);
+      await deleteMutation.mutateAsync(categoryToDelete);
       setDeleteDialogVisible(false);
       setCategoryToDelete(null);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Error al eliminar la categoría');
     }
   };
 
   const handleToggleStatus = async (id: string) => {
     try {
-      setLoading(true);
-      await toggleCategoryStatus(id);
-      await loadCategories();
-    } catch (error) {
-      console.error('Error toggling category status:', error);
-    } finally {
-      setLoading(false);
+      await toggleStatusMutation.mutateAsync(id);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Error al cambiar el estado');
     }
   };
 
@@ -174,7 +164,7 @@ export const CategoryManager = () => {
           </View>
         )}
         refreshing={loading}
-        onRefresh={loadCategories}
+        onRefresh={() => {}}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No hay categorías</Text>
         }
