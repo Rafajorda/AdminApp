@@ -52,7 +52,7 @@ const UserFormScreen = () => {
     } catch (error) {
       console.error('Error loading user:', error);
       alert('Error al cargar el usuario');
-      router.back();
+      router.push('/users-dashboard');
     } finally {
       setInitialLoading(false);
     }
@@ -114,7 +114,7 @@ const UserFormScreen = () => {
         await createUser(formData as CreateUserDto);
         alert('Usuario creado correctamente');
       }
-      router.back();
+      router.push('/users-dashboard');
     } catch (error: any) {
       console.error('Error saving user:', error);
       alert(error.message || 'Error al guardar el usuario');
@@ -127,7 +127,7 @@ const UserFormScreen = () => {
     return (
       <View style={styles.container}>
         <Appbar.Header>
-          <Appbar.BackAction onPress={() => router.back()} />
+          <Appbar.BackAction onPress={() => router.push('/users-dashboard')} />
           <Appbar.Content title="Cargando..." />
         </Appbar.Header>
         <View style={styles.loadingContainer}>
@@ -140,7 +140,7 @@ const UserFormScreen = () => {
   return (
     <View style={styles.container}>
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.BackAction onPress={() => router.push('/users-dashboard')} />
         <Appbar.Content title={isEditing ? 'Editar Usuario' : 'Crear Usuario'} />
         <Appbar.Action 
           icon="content-save" 
@@ -168,7 +168,7 @@ const UserFormScreen = () => {
         <View style={styles.actions}>
           <Button
             mode="outlined"
-            onPress={() => router.back()}
+            onPress={() => router.push('/users-dashboard')}
             style={styles.cancelButton}
             disabled={loading}
           >

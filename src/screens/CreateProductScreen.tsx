@@ -236,7 +236,7 @@ export default function CreateProductScreen() {
         <View style={styles.buttonContainer}>
           <Button
             mode="outlined"
-            onPress={() => router.back()}
+            onPress={() => router.push('/products')}
             disabled={isSubmitting}
             style={styles.button}
           >
