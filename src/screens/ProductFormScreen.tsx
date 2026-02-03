@@ -4,13 +4,14 @@
  * Componente reutilizable para crear o editar productos
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import {
   Button,
@@ -19,12 +20,14 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useProductForm } from '../hooks/useProductForm';
+import { useUploadModel3DMutation, useDeleteModel3DMutation } from '../hooks/queries';
 import { colors } from '../theme';
 import {
   ProductBasicFields,
   ProductCategorySelector,
   ProductColorSelector,
 } from '../components/products';
+import { FileUpload3D } from '../components/common';
 
 interface ProductFormScreenProps {
   productId?: string;
@@ -42,14 +45,64 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
     fieldErrors,
     error,
     isEditMode,
+    product,
     updateField,
     handleCategoryToggle,
     handleColorToggle,
     handleSubmit: submitForm,
   } = useProductForm({ productId });
 
+  const uploadModel3DMutation = useUploadModel3DMutation();
+  const deleteModel3DMutation = useDeleteModel3DMutation();
+  
+  const [selectedModel3DFile, setSelectedModel3DFile] = useState<{
+    uri: string;
+    name: string;
+    mimeType?: string;
+    size?: number;
+  } | null>(null);
+
   const handleSubmit = async () => {
+    // Primero guardar el producto
     await submitForm();
+    
+    // Si hay un modelo 3D seleccionado y estamos en modo edición, subirlo
+    if (selectedModel3DFile && productId) {
+      try {
+        await uploadModel3DMutation.mutateAsync({
+          productId,
+          file: selectedModel3DFile,
+        });
+        Alert.alert('Éxito', 'Producto y modelo 3D guardados correctamente');
+      } catch (error) {
+        Alert.alert('Advertencia', 'Producto guardado pero el modelo 3D no pudo subirse');
+      }
+    }
+  };
+
+  const handleDeleteModel3D = async () => {
+    if (!productId) return;
+    
+    Alert.alert(
+      'Eliminar modelo 3D',
+      '¿Estás seguro de que quieres eliminar el modelo 3D?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteModel3DMutation.mutateAsync(productId);
+              setSelectedModel3DFile(null);
+              Alert.alert('Éxito', 'Modelo 3D eliminado correctamente');
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo eliminar el modelo 3D');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const isLoading = isLoadingOptions || isLoadingProduct;
@@ -94,6 +147,17 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
           onToggle={handleColorToggle}
         />
 
+        {/* Subir modelo 3D (solo en modo edición) */}
+        {isEditMode && productId && (
+          <FileUpload3D
+            onFileSelected={setSelectedModel3DFile}
+            onDelete={handleDeleteModel3D}
+            currentModelUrl={product?.model3DPath}
+            isUploading={uploadModel3DMutation.isPending}
+            isDeleting={deleteModel3DMutation.isPending}
+          />
+        )}
+
         {/* Mensaje de error general */}
         {error && (
           <Text variant="bodyMedium" style={styles.errorText}>
@@ -105,7 +169,7 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
         <View style={styles.buttonContainer}>
           <Button
             mode="outlined"
-            onPress={() => router.back()}
+            onPress={() => router.push('/products')}
             disabled={isSubmitting}
             style={styles.button}
           >
