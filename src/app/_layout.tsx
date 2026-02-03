@@ -1,9 +1,21 @@
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
 import { lightTheme } from '../theme';
 import { UserRole } from '../services/authService';
+
+// Configurar React Query Client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutos
+      gcTime: 1000 * 60 * 10, // 10 minutos (antes cacheTime)
+    },
+  },
+});
 
 /**
  * Componente interno que maneja la navegación protegida
@@ -73,8 +85,10 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <PaperProvider theme={lightTheme}>
-      <RootLayoutNav />
-    </PaperProvider>
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={lightTheme}>
+        <RootLayoutNav />
+      </PaperProvider>
+    </QueryClientProvider>
   );
 }
