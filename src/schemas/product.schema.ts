@@ -63,7 +63,7 @@ export const CreateProductSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').max(100),
   description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres').max(500),
   material: z.string().min(2, 'El material debe tener al menos 2 caracteres').max(50),
-  price: z.number().positive('El precio debe ser mayor a 0').max(999999.99),
+  price: z.coerce.number().positive('El precio debe ser mayor a 0').max(999999.99),
   dimensions: z.string().optional().or(z.literal('')).nullable(),
   // Campos de imagen (completamente opcionales)
   imageUrl: z.string().url('Debe ser una URL válida').optional().or(z.literal('')).nullable(),
@@ -80,7 +80,7 @@ export const UpdateProductSchema = z.object({
   name: z.string().min(3).max(100).optional(),
   description: z.string().min(10).max(500).optional(),
   material: z.string().min(2).max(50).optional(),
-  price: z.number().positive().max(999999.99).optional(),
+  price: z.coerce.number().positive().max(999999.99).optional(),
   dimensions: z.string().optional().nullable(),
   status: z.enum(['active', 'inactive']).optional(),
   model3DPath: z.string().url().optional().nullable(),
