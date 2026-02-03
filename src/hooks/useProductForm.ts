@@ -1,17 +1,21 @@
 /**
  * Hook personalizado para formulario de productos (crear/editar)
  * 
- * Gestiona el estado del formulario, validación y lógica de guardado
+ * Gestiona el estado del formulario, validación y lógica de guardado usando React Query
  */
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { CreateProductInput, Product } from '../types/product';
-import { createProduct, updateProduct, getProductById } from '../services/productService';
-import { getCategories } from '../services/categoryService';
-import { getColors } from '../services/colorService';
+import { CreateProductInput } from '../types/product';
 import { Category, Color } from '../types/product';
 import { CreateProductSchema, UpdateProductSchema } from '../schemas/product.schema';
+import {
+  useProductQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useCategoriesQuery,
+  useColorsQuery,
+} from './queries';
 
 interface UseProductFormProps {
   productId?: string; // Si existe, es modo edición
@@ -36,6 +40,9 @@ interface UseProductFormReturn {
   // Modo
   isEditMode: boolean;
   
+  // Producto cargado (solo en modo edición)
+  product?: any;
+  
   // Acciones
   handleSubmit: () => Promise<void>;
   handleCategoryToggle: (categoryId: string) => void;
@@ -59,66 +66,43 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
   const router = useRouter();
   const isEditMode = !!productId;
   
+  // React Query hooks
+  const { data: product, isLoading: isLoadingProduct } = useProductQuery(productId || '', {
+    enabled: !!productId,
+  });
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategoriesQuery();
+  const { data: colors = [], isLoading: isLoadingColors } = useColorsQuery();
+  const createMutation = useCreateProductMutation();
+  const updateMutation = useUpdateProductMutation();
+  
   // Estado del formulario
   const [formData, setFormData] = useState<CreateProductInput>(initialFormData);
   
-  // Categorías y colores
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [colors, setColors] = useState<Color[]>([]);
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
-  const [isLoadingProduct, setIsLoadingProduct] = useState(isEditMode);
-  
   // Estados de UI
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  const isLoadingOptions = isLoadingCategories || isLoadingColors;
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+
   /**
-   * Carga categorías, colores y producto (si es edición)
+   * Carga el producto cuando está disponible (modo edición)
    */
   useEffect(() => {
-    loadData();
-  }, [productId]);
-
-  const loadData = async () => {
-    try {
-      setIsLoadingOptions(true);
-      
-      // Cargar categorías y colores
-      const [categoriesData, colorsData] = await Promise.all([
-        getCategories(),
-        getColors(),
-      ]);
-      
-      setCategories(categoriesData);
-      setColors(colorsData);
-      
-      // Si es modo edición, cargar el producto
-      if (productId) {
-        setIsLoadingProduct(true);
-        const product = await getProductById(productId);
-        
-        // Mapear producto a formData
-        setFormData({
-          name: product.name,
-          description: product.description,
-          material: product.material || '',
-          price: product.price,
-          dimensions: product.dimensions || '',
-          imageUrl: product.images?.[0]?.src || '',
-          imageAlt: product.images?.[0]?.alt || '',
-          categoryIds: product.categories.map(c => c.id),
-          colorIds: product.colors.map(c => c.id),
-        });
-        setIsLoadingProduct(false);
-      }
-    } catch (err) {
-      console.error('[useProductForm] Error loading data:', err);
-      setError('Error al cargar datos');
-    } finally {
-      setIsLoadingOptions(false);
+    if (product && isEditMode) {
+      setFormData({
+        name: product.name,
+        description: product.description,
+        material: product.material || '',
+        price: product.price,
+        dimensions: product.dimensions || '',
+        imageUrl: product.images?.[0]?.src || '',
+        imageAlt: product.images?.[0]?.alt || '',
+        categoryIds: product.categories.map(c => c.id),
+        colorIds: product.colors.map(c => c.id),
+      });
     }
-  };
+  }, [product, isEditMode]);
 
   /**
    * Actualiza un campo del formulario
@@ -189,23 +173,25 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
    */
   const handleSubmit = async () => {
     try {
-      setIsSubmitting(true);
       setError(null);
       setFieldErrors({});
 
       if (isEditMode && productId) {
         // Modo edición: validar con UpdateProductSchema
         const validatedData = UpdateProductSchema.parse({ id: productId, ...formData });
-        // Eliminar el id del payload ya que va en la URL
         const { id, ...dataWithoutId } = validatedData;
-        await updateProduct(productId, dataWithoutId);
+        
+        await updateMutation.mutateAsync({
+          id: productId,
+          data: dataWithoutId,
+        });
       } else {
         // Modo creación: validar con CreateProductSchema
         const validatedData = CreateProductSchema.parse(formData);
-        await createProduct(validatedData);
+        await createMutation.mutateAsync(validatedData);
       }
-
-      // Navegar de vuelta al dashboard
+      
+      // Redirigir al dashboard de productos
       router.back();
     } catch (err: any) {
       console.error('[useProductForm] Error submitting:', err);
@@ -219,7 +205,6 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
           console.log(`[useProductForm] Field error - ${field}:`, error.message);
         });
         setFieldErrors(errors);
-        // Crear mensaje más descriptivo con los campos que tienen error
         const errorFields = Object.keys(errors).join(', ');
         setError(`Por favor corrige los errores en: ${errorFields}`);
       } else {
@@ -232,8 +217,6 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
           setError(err.message || `Error al ${isEditMode ? 'actualizar' : 'crear'} el producto`);
         }
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -248,6 +231,7 @@ export const useProductForm = ({ productId }: UseProductFormProps = {}): UseProd
     error,
     fieldErrors,
     isEditMode,
+    product,
     handleSubmit,
     handleCategoryToggle,
     handleColorToggle,
