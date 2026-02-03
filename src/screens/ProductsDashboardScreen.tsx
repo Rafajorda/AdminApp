@@ -10,54 +10,65 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Modal } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, Modal, Alert } from 'react-native';
 import {
   FAB,
   ActivityIndicator,
   Appbar,
   Button,
   Text,
+  Portal,
+  Dialog,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
 import { colors } from '../theme';
-import { useProducts } from '../hooks/useProducts';
+import { 
+  useProductsQuery, 
+  useDeleteProductMutation,
+  useToggleProductStatusMutation,
+} from '../hooks/queries';
 import { Product } from '../types/product';
 import { ProductCard, ProductListHeader, ProductLabel, QRScanner } from '../components/products';
 
 export const ProductsDashboardScreen = () => {
   const router = useRouter();
-  const {
-    products,
-    isLoading,
-    isRefreshing,
-    pagination,
-    search,
-    refresh,
-    loadMore,
-    deleteProduct,
-    toggleStatus,
-  } = useProducts();
+  
+  // React Query hooks
+  const { data: products = [], isLoading, refetch, isRefetching } = useProductsQuery();
+  const deleteProductMutation = useDeleteProductMutation();
+  const toggleStatusMutation = useToggleProductStatusMutation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showScanner, setShowScanner] = useState(false);
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<{ id: string; name: string } | null>(null);
 
   /**
    * Refresca la lista cuando la pantalla obtiene el foco
    */
   useFocusEffect(
     React.useCallback(() => {
-      refresh();
-    }, [refresh])
+      refetch();
+    }, [refetch])
   );
+
+  /**
+   * Productos filtrados por búsqueda
+   */
+  const filteredProducts = searchQuery.trim()
+    ? products.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : products;
 
   /**
    * Maneja la búsqueda de productos
    */
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    search(query);
   };
 
   /**
@@ -75,14 +86,27 @@ export const ProductsDashboardScreen = () => {
   };
 
   /**
-   * Confirma y elimina un producto
+   * Confirma eliminación de producto
    */
-  const handleDeleteProduct = async (id: string, name: string) => {
-    // TODO: Mostrar diálogo de confirmación
+  const handleDeleteProduct = (id: string, name: string) => {
+    setProductToDelete({ id, name });
+    setDeleteDialogVisible(true);
+  };
+
+  /**
+   * Confirma y ejecuta eliminación
+   */
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
+
     try {
-      await deleteProduct(id);
+      await deleteProductMutation.mutateAsync(productToDelete.id);
+      Alert.alert('Éxito', 'Producto eliminado correctamente');
     } catch (error) {
-      console.error('Error eliminando producto:', error);
+      Alert.alert('Error', 'No se pudo eliminar el producto');
+    } finally {
+      setDeleteDialogVisible(false);
+      setProductToDelete(null);
     }
   };
 
@@ -91,9 +115,9 @@ export const ProductsDashboardScreen = () => {
    */
   const handleToggleStatus = async (id: string) => {
     try {
-      await toggleStatus(id);
+      await toggleStatusMutation.mutateAsync(id);
     } catch (error) {
-      console.error('Error cambiando estado:', error);
+      Alert.alert('Error', 'No se pudo cambiar el estado del producto');
     }
   };
 
@@ -142,7 +166,7 @@ export const ProductsDashboardScreen = () => {
    * Footer de la lista con indicador de carga
    */
   const renderFooter = () => {
-    if (!isLoading || products.length === 0) return null;
+    if (!isRefetching || products.length === 0) return null;
     return (
       <View style={styles.footerLoader}>
         <ActivityIndicator size="small" color={colors.light.primary} />
@@ -182,7 +206,7 @@ export const ProductsDashboardScreen = () => {
     <View style={styles.container}>
       {/* Appbar */}
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.BackAction onPress={() => router.push('/dashboard')} />
         <Appbar.Content title="Productos" />
         <Appbar.Action icon="qrcode-scan" onPress={handleOpenScanner} />
       </Appbar.Header>
@@ -191,20 +215,18 @@ export const ProductsDashboardScreen = () => {
       <ProductListHeader
         searchQuery={searchQuery}
         onSearchChange={handleSearch}
-        totalCount={pagination.total}
+        totalCount={filteredProducts.length}
       />
 
       {/* Lista de productos */}
       <FlatList
-        data={products}
+        data={filteredProducts}
         renderItem={renderProduct}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
       />
@@ -216,6 +238,22 @@ export const ProductsDashboardScreen = () => {
         onPress={handleCreateProduct}
         label="Nuevo Producto"
       />
+
+      {/* Diálogo de confirmación de eliminación */}
+      <Portal>
+        <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
+          <Dialog.Title>Confirmar eliminación</Dialog.Title>
+          <Dialog.Content>
+            <Text>¿Estás seguro de que quieres eliminar "{productToDelete?.name}"?</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDeleteDialogVisible(false)}>Cancelar</Button>
+            <Button onPress={confirmDelete} loading={deleteProductMutation.isPending}>
+              Eliminar
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
 
       {/* Modal de etiqueta del producto */}
       <Modal
