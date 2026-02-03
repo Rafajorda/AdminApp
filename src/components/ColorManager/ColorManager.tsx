@@ -1,58 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, Alert } from 'react-native';
 import { Text, Button, TextInput, Card, IconButton, Portal, Dialog } from 'react-native-paper';
 import { Color, CreateColorDto } from '../../types/color';
-import { getColors, createColor, updateColor, deleteColor } from '../../services/colorService';
+import {
+  useColorsQuery,
+  useCreateColorMutation,
+  useUpdateColorMutation,
+  useDeleteColorMutation,
+} from '../../hooks/queries';
 import { styles } from './ColorManager.styles';
 
 export const ColorManager = () => {
-  const [colorList, setColorList] = useState<Color[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: colorList = [], isLoading: loadingColors } = useColorsQuery();
+  const createMutation = useCreateColorMutation();
+  const updateMutation = useUpdateColorMutation();
+  const deleteMutation = useDeleteColorMutation();
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateColorDto>({ name: '', hexCode: '' });
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [colorToDelete, setColorToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadColors();
-  }, []);
-
-  const loadColors = async () => {
-    try {
-      setLoading(true);
-      const data = await getColors();
-      setColorList(data);
-    } catch (error) {
-      console.error('Error loading colors:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = loadingColors || 
+    createMutation.isPending || 
+    updateMutation.isPending || 
+    deleteMutation.isPending;
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) return;
 
     try {
-      setLoading(true);
       const dataToSend: CreateColorDto = {
         name: formData.name,
         ...(formData.hexCode && { hexCode: formData.hexCode }),
       };
       
       if (isEditing && editingId) {
-        await updateColor(editingId, dataToSend);
+        await updateMutation.mutateAsync({ id: editingId, data: dataToSend });
       } else {
-        await createColor(dataToSend);
+        await createMutation.mutateAsync(dataToSend);
       }
       setFormData({ name: '', hexCode: '' });
       setIsEditing(false);
       setEditingId(null);
-      await loadColors();
-    } catch (error) {
-      console.error('Error saving color:', error);
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Error al guardar el color');
     }
   };
 
@@ -77,15 +70,11 @@ export const ColorManager = () => {
     if (!colorToDelete) return;
 
     try {
-      setLoading(true);
-      await deleteColor(colorToDelete);
-      await loadColors();
-    } catch (error) {
-      console.error('Error deleting color:', error);
-    } finally {
-      setLoading(false);
+      await deleteMutation.mutateAsync(colorToDelete);
       setDeleteDialogVisible(false);
       setColorToDelete(null);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Error al eliminar el color');
     }
   };
 
@@ -173,7 +162,7 @@ export const ColorManager = () => {
           </View>
         )}
         refreshing={loading}
-        onRefresh={loadColors}
+        onRefresh={() => {}}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No hay colores</Text>
         }

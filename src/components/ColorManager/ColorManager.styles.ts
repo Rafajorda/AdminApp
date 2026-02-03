@@ -46,13 +46,21 @@ export const styles = StyleSheet.create({
   itemInfo: {
     flex: 1,
   },
+  colorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   colorPreview: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ddd',
-    marginRight: 8,
+  },
+  hexCode: {
+    color: colors.light.textSecondary,
+    marginTop: 2,
   },
   itemActions: {
     flexDirection: 'row',
