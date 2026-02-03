@@ -3,7 +3,7 @@ import { View, FlatList } from 'react-native';
 import { Text, IconButton, Portal, Dialog, Chip, Button, Searchbar, FAB } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { User, UserRole } from '../../types/user';
-import { getUsers, toggleUserStatus, deleteUser, PaginatedResponse } from '../../services/userService';
+import { useUsersQuery, useDeleteUserMutation, useToggleUserStatusMutation } from '../../hooks/queries';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../theme';
 import { styles } from './UserManager.styles';
@@ -11,55 +11,30 @@ import { styles } from './UserManager.styles';
 export const UserManager = () => {
   const router = useRouter();
   const currentUser = useAuthStore((state) => state.user);
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
 
-  useEffect(() => {
-    loadUsers(1);
-  }, []);
+  const { data, isLoading, refetch } = useUsersQuery(currentPage, 20);
+  const deleteUserMutation = useDeleteUserMutation();
+  const toggleStatusMutation = useToggleUserStatusMutation();
 
-  useEffect(() => {
-    filterUsers();
-  }, [searchQuery, users]);
+  const users = data?.data || [];
+  const totalPages = data?.totalPages || 1;
+  const total = data?.total || 0;
 
-  const loadUsers = async (page: number = 1) => {
-    try {
-      setLoading(true);
-      const response: PaginatedResponse = await getUsers(page, 20);
-      setUsers(response.data);
-      setCurrentPage(response.page);
-      setTotalPages(response.totalPages);
-      setTotal(response.total);
-    } catch (error) {
-      console.error('Error loading users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterUsers = () => {
-    if (!searchQuery.trim()) {
-      setFilteredUsers(users);
-      return;
-    }
-
-    const query = searchQuery.toLowerCase();
-    const filtered = users.filter(
-      (user) =>
-        user.username.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.firstName?.toLowerCase().includes(query) ||
-        user.lastName?.toLowerCase().includes(query)
-    );
-    setFilteredUsers(filtered);
-  };
+  const filteredUsers = searchQuery.trim()
+    ? users.filter((user) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          user.username.toLowerCase().includes(query) ||
+          user.email.toLowerCase().includes(query) ||
+          user.firstName?.toLowerCase().includes(query) ||
+          user.lastName?.toLowerCase().includes(query)
+        );
+      })
+    : users;
 
   const handleEdit = (id: number) => {
     router.push(`/edit-user/${id}`);
@@ -74,35 +49,29 @@ export const UserManager = () => {
     if (!userToDelete) return;
 
     try {
-      setLoading(true);
-      await deleteUser(userToDelete);
-      await loadUsers();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    } finally {
-      setLoading(false);
+      await deleteUserMutation.mutateAsync(userToDelete);
       setDeleteDialogVisible(false);
       setUserToDelete(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
     }
   };
 
   const handleToggleStatus = async (id: number) => {
     try {
-      setLoading(true);
-      await toggleUserStatus(id);
-      await loadUsers(currentPage);
+      await toggleStatusMutation.mutateAsync(id);
     } catch (error) {
       console.error('Error toggling user status:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      loadUsers(newPage);
+      setCurrentPage(newPage);
     }
   };
+
+  const loading = isLoading || deleteUserMutation.isPending || toggleStatusMutation.isPending;
 
   return (
     <View style={styles.container}>
@@ -169,7 +138,7 @@ export const UserManager = () => {
           );
         }}
         refreshing={loading}
-        onRefresh={() => loadUsers(currentPage)}
+        onRefresh={() => refetch()}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No hay usuarios</Text>
         }
