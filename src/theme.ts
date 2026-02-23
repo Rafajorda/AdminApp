@@ -105,6 +105,29 @@ export const colors = {
     error: '#BA1A1A',
     success: '#6B8C5F',
     warning: '#D9A05F',
+    // Colores de estados de pedidos
+    orderStatus: {
+      pending: {
+        background: '#FFF3E0',
+        text: '#E65100',
+      },
+      processing: {
+        background: '#E3F2FD',
+        text: '#1565C0',
+      },
+      shipped: {
+        background: '#F3E5F5',
+        text: '#6A1B9A',
+      },
+      completed: {
+        background: '#E8F5E9',
+        text: '#2E7D32',
+      },
+      cancelled: {
+        background: '#FFEBEE',
+        text: '#C62828',
+      },
+    },
   },
   dark: {
     primary: '#5A6B3F',
@@ -117,5 +140,28 @@ export const colors = {
     error: '#FFB4AB',
     success: '#8AAF7F',
     warning: '#FFB871',
+    // Colores de estados de pedidos (modo oscuro)
+    orderStatus: {
+      pending: {
+        background: '#4A3000',
+        text: '#FFB871',
+      },
+      processing: {
+        background: '#003B5C',
+        text: '#90CAF9',
+      },
+      shipped: {
+        background: '#4A1458',
+        text: '#CE93D8',
+      },
+      completed: {
+        background: '#1B5E20',
+        text: '#A5D6A7',
+      },
+      cancelled: {
+        background: '#5F1010',
+        text: '#FFB4AB',
+      },
+    },
   },
 };
