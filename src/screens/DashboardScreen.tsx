@@ -118,7 +118,7 @@ export const DashboardScreen = () => {
           <Card.Actions>
             <Button 
               mode="contained" 
-              onPress={() => console.log('Ir a pedidos')}
+              onPress={() => router.push('/orders')}
               style={styles.optionButton}
             >
               Ver Pedidos
