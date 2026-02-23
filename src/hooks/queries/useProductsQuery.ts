@@ -81,7 +81,11 @@ export function useUploadModel3DMutation() {
       
       // Crear blob del archivo
       const blob = await fetch(file.uri).then(r => r.blob());
-      formData.append('file', blob, file.name || 'model.glb');
+      formData.append('file', {
+        uri: file.uri,
+        type: file.mimeType || 'model/gltf-binary',
+        name: file.name || 'model.glb'
+      } as any);
       
       const response = await fetch(`${API_URL}/product/${productId}/model`, {
         method: 'POST',
