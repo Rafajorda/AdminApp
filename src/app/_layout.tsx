@@ -3,7 +3,8 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from '../stores/authStore';
-import { lightTheme } from '../theme';
+import { useThemeStore } from '../stores/themeStore';
+import { lightTheme, darkTheme } from '../theme';
 import { UserRole } from '../services/authService';
 
 // Configurar React Query Client
@@ -71,10 +72,15 @@ function RootLayoutNav() {
  */
 export default function RootLayout() {
   const loadUserData = useAuthStore((state) => state.loadUserData);
+  const { themeMode, loadThemePreference } = useThemeStore();
 
-  // Cargar datos del usuario al iniciar la app
+  // Seleccionar el tema según la preferencia del usuario
+  const currentTheme = themeMode === 'dark' ? darkTheme : lightTheme;
+
+  // Cargar datos del usuario y tema al iniciar la app
   useEffect(() => {
     loadUserData();
+    loadThemePreference();
 
     // Verificar validez de sesión cada 30 segundos
     const interval = setInterval(() => {
@@ -86,7 +92,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PaperProvider theme={lightTheme}>
+      <PaperProvider theme={currentTheme}>
         <RootLayoutNav />
       </PaperProvider>
     </QueryClientProvider>
