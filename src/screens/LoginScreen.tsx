@@ -5,7 +5,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { colors } from '../theme';
+import { useTheme } from 'react-native-paper';
 import { useLoginForm } from '../hooks/useLoginForm';
 import { LoginHeader, LoginForm } from '../components/login';
 
@@ -22,6 +22,8 @@ import { LoginHeader, LoginForm } from '../components/login';
  * Toda la lógica del formulario está encapsulada en useLoginForm
  */
 export const LoginScreen = () => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const {
     email,
     password,
@@ -65,10 +67,10 @@ export const LoginScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     flexGrow: 1,

@@ -18,10 +18,10 @@ import {
   Portal,
   Dialog,
   SegmentedButtons,
+  useTheme,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from 'expo-router';
-import { colors } from '../theme';
 import { getOrderStatusText } from '../utils/orderStatus';
 import { 
   useOrdersQuery, 
@@ -33,6 +33,8 @@ import { OrderCard } from '../components/orders';
 
 export const OrdersDashboardScreen = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
   
   // React Query hooks
   const { data: orders = [], isLoading, refetch, isRefetching } = useOrdersQuery();
@@ -122,7 +124,7 @@ export const OrdersDashboardScreen = () => {
     if (!isRefetching || orders.length === 0) return null;
     return (
       <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={colors.light.primary} />
+        <ActivityIndicator size="small" color={theme.colors.primary} />
       </View>
     );
   };
@@ -175,7 +177,7 @@ export const OrdersDashboardScreen = () => {
       {/* Lista de pedidos */}
       {isLoading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={colors.light.primary} />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : (
         <FlatList
@@ -187,7 +189,7 @@ export const OrdersDashboardScreen = () => {
             <RefreshControl
               refreshing={isRefetching}
               onRefresh={refetch}
-              colors={[colors.light.primary]}
+              colors={[theme.colors.primary]}
             />
           }
           ListEmptyComponent={renderEmpty}
@@ -207,7 +209,7 @@ export const OrdersDashboardScreen = () => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setDeleteDialogVisible(false)}>Cancelar</Button>
-            <Button onPress={confirmDelete} textColor={colors.light.error}>
+            <Button onPress={confirmDelete} textColor={theme.colors.error}>
               Eliminar
             </Button>
           </Dialog.Actions>
@@ -217,14 +219,14 @@ export const OrdersDashboardScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   filterContainer: {
     padding: 16,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     elevation: 2,
   },
   segmentedButtons: {
@@ -232,7 +234,7 @@ const styles = StyleSheet.create({
   },
   countText: {
     textAlign: 'center',
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   listContainer: {
     paddingBottom: 16,
@@ -254,10 +256,10 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     marginBottom: 8,
-    color: colors.light.text,
+    color: theme.colors.onBackground,
   },
   emptyText: {
     textAlign: 'center',
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
 });

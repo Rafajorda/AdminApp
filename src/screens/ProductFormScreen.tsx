@@ -17,11 +17,11 @@ import {
   Button,
   ActivityIndicator,
   Text,
+  useTheme,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useProductForm } from '../hooks/useProductForm';
 import { useUploadModel3DMutation, useDeleteModel3DMutation } from '../hooks/queries';
-import { colors } from '../theme';
 import {
   ProductBasicFields,
   ProductCategorySelector,
@@ -35,6 +35,8 @@ interface ProductFormScreenProps {
 
 export default function ProductFormScreen({ productId }: ProductFormScreenProps) {
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const {
     formData,
     categories,
@@ -110,7 +112,7 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.light.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text variant="bodyLarge" style={styles.loadingText}>
           Cargando producto...
         </Text>
@@ -190,10 +192,10 @@ export default function ProductFormScreen({ productId }: ProductFormScreenProps)
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     padding: 16,
@@ -204,7 +206,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   loadingText: {
     marginTop: 12,
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 14,
     marginTop: 8,
-    color: colors.light.error,
+    color: theme.colors.error,
   },
   buttonContainer: {
     flexDirection: 'row',

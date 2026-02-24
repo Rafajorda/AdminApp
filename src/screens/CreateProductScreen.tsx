@@ -32,6 +32,7 @@ import { useCreateProduct } from '../hooks/useCreateProduct';
 export default function CreateProductScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const styles = getStyles(theme);
   const {
     formData,
     categories,
@@ -258,10 +259,10 @@ export default function CreateProductScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
     padding: 16,
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: theme.colors.outline,
   },
   errorText: {
     fontSize: 14,

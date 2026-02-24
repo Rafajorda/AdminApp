@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { SegmentedButtons, Appbar } from 'react-native-paper';
+import { SegmentedButtons, Appbar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { CategoryManager } from '../components/CategoryManager';
 import { ColorManager } from '../components/ColorManager';
-import { colors } from '../theme';
 
 const EntitiesDashboardScreen = () => {
   const [selectedEntity, setSelectedEntity] = useState('categories');
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   return (
     <View style={styles.container}>
@@ -35,10 +36,10 @@ const EntitiesDashboardScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   segmentedButtons: {
     margin: 16,

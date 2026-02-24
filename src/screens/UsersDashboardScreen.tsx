@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { Appbar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { UserManager } from '../components/UserManager';
-import { colors } from '../theme';
 
 const UsersDashboardScreen = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   return (
     <View style={styles.container}>
@@ -22,10 +23,10 @@ const UsersDashboardScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   content: {
     flex: 1,

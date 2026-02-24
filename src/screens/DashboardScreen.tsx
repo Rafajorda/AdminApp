@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Button, Card, Avatar, Snackbar } from 'react-native-paper';
+import { Text, Button, Card, Avatar, Snackbar, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthStore } from '../stores/authStore';
-import { colors } from '../theme';
 
 /**
  * Pantalla de Dashboard / CRUD
@@ -17,6 +16,8 @@ export const DashboardScreen = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [showWelcome, setShowWelcome] = useState(false);
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   // Mostrar mensaje de bienvenida solo cuando viene desde login
   useEffect(() => {
@@ -154,7 +155,7 @@ export const DashboardScreen = () => {
           <Card.Actions>
             <Button 
               mode="contained" 
-              onPress={() => console.log('Ir a configuración')}
+              onPress={() => router.push('/settings')}
               style={styles.optionButton}
             >
               Configuración
@@ -170,7 +171,7 @@ export const DashboardScreen = () => {
           onPress={handleLogout}
           icon="logout"
           style={styles.logoutButton}
-          textColor={colors.light.error}
+          textColor={theme.colors.error}
         >
           Cerrar Sesión
         </Button>
@@ -179,14 +180,14 @@ export const DashboardScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   userCard: {
     margin: 16,
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
   userCardContent: {
     flexDirection: 'row',
@@ -194,47 +195,47 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   avatar: {
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
   },
   userInfo: {
     marginLeft: 16,
     flex: 1,
   },
   welcomeText: {
-    color: colors.light.surface,
+    color: theme.colors.surface,
     fontWeight: 'bold',
   },
   userEmail: {
-    color: colors.light.surface,
+    color: theme.colors.surface,
     marginTop: 4,
   },
   snackbar: {
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
   section: {
     padding: 16,
   },
   sectionTitle: {
     marginBottom: 16,
-    color: colors.light.text,
+    color: theme.colors.onBackground,
     fontWeight: 'bold',
   },
   optionCard: {
     marginBottom: 12,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
   },
   optionDescription: {
     marginTop: 4,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   optionButton: {
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
   logoutSection: {
     padding: 16,
     paddingBottom: 32,
   },
   logoutButton: {
-    borderColor: colors.light.error,
+    borderColor: theme.colors.error,
   },
 });

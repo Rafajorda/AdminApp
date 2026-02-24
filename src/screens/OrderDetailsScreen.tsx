@@ -20,9 +20,9 @@ import {
   Divider,
   Portal,
   Dialog,
+  useTheme,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { colors } from '../theme';
 import { OrderStatusChip } from '../components/orders';
 import { getOrderStatusText, ORDER_STATUSES } from '../utils/orderStatus';
 import { 
@@ -35,6 +35,8 @@ export const OrderDetailsScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const orderId = parseInt(id || '0', 10);
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   const { data: order, isLoading } = useOrderQuery(orderId);
   const updateStatusMutation = useUpdateOrderStatusMutation();
@@ -87,7 +89,7 @@ export const OrderDetailsScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.light.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -112,7 +114,7 @@ export const OrderDetailsScreen = () => {
         <Appbar.Action 
           icon="delete" 
           onPress={() => setDeleteDialogVisible(true)}
-          color={colors.light.error}
+          color={theme.colors.error}
         />
       </Appbar.Header>
 
@@ -234,8 +236,8 @@ export const OrderDetailsScreen = () => {
               mode="outlined"
               icon="delete"
               onPress={() => setDeleteDialogVisible(true)}
-              textColor={colors.light.error}
-              style={[styles.actionButton, { borderColor: colors.light.error }]}
+              textColor={theme.colors.error}
+              style={[styles.actionButton, { borderColor: theme.colors.error }]}
             >
               Eliminar Pedido
             </Button>
@@ -283,7 +285,7 @@ export const OrderDetailsScreen = () => {
             <Button onPress={() => setDeleteDialogVisible(false)}>Cancelar</Button>
             <Button 
               onPress={handleDelete} 
-              textColor={colors.light.error}
+              textColor={theme.colors.error}
               loading={deleteOrderMutation.isPending}
             >
               Eliminar
@@ -295,10 +297,10 @@ export const OrderDetailsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   content: {
     flex: 1,
@@ -329,10 +331,10 @@ const styles = StyleSheet.create({
   },
   orderId: {
     fontWeight: 'bold',
-    color: colors.light.text,
+    color: theme.colors.onBackground,
   },
   date: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 4,
   },
   divider: {
@@ -344,14 +346,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontWeight: 'bold',
     marginBottom: 8,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   secondaryText: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 2,
   },
   total: {
-    color: colors.light.primary,
+    color: theme.colors.primary,
     fontWeight: 'bold',
   },
   cardTitle: {
@@ -369,7 +371,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: theme.colors.surfaceVariant,
   },
   productInfo: {
     flex: 1,
@@ -379,7 +381,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   productDescription: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginBottom: 8,
   },
   productPricing: {
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: 'center',
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     padding: 16,
   },
   actionButton: {
