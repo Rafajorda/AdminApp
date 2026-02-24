@@ -1,17 +1,16 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     marginVertical: 12,
   },
   label: {
     fontWeight: '600',
-    color: colors.light.text,
+    color: theme.colors.onBackground,
     marginBottom: 8,
   },
   uploadButton: {
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -51,7 +50,7 @@ export const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 8,
   },
 });

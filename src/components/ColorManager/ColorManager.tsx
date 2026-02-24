@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, FlatList, Alert } from 'react-native';
-import { Text, Button, TextInput, Card, IconButton, Portal, Dialog } from 'react-native-paper';
+import { Text, Button, TextInput, Card, IconButton, Portal, Dialog, useTheme } from 'react-native-paper';
 import { Color, CreateColorDto } from '../../types/color';
 import {
   useColorsQuery,
@@ -8,9 +8,11 @@ import {
   useUpdateColorMutation,
   useDeleteColorMutation,
 } from '../../hooks/queries';
-import { styles } from './ColorManager.styles';
+import { getStyles } from './ColorManager.styles';
 
 export const ColorManager = () => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { data: colorList = [], isLoading: loadingColors } = useColorsQuery();
   const createMutation = useCreateColorMutation();
   const updateMutation = useUpdateColorMutation();

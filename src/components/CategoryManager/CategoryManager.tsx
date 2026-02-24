@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, FlatList, Alert } from 'react-native';
-import { Text, Button, TextInput, Card, IconButton, Portal, Dialog } from 'react-native-paper';
+import { Text, Button, TextInput, Card, IconButton, Portal, Dialog, useTheme } from 'react-native-paper';
 import { Category, CreateCategoryDto } from '../../types/category';
 import {
   useCategoriesQuery,
@@ -9,10 +9,11 @@ import {
   useDeleteCategoryMutation,
   useToggleCategoryStatusMutation,
 } from '../../hooks/queries';
-import { colors } from '../../theme';
-import { styles } from './CategoryManager.styles';
+import { getStyles } from './CategoryManager.styles';
 
 export const CategoryManager = () => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const { data: categories = [], isLoading: loadingCategories } = useCategoriesQuery();
   const createMutation = useCreateCategoryMutation();
   const updateMutation = useUpdateCategoryMutation();
@@ -145,7 +146,7 @@ export const CategoryManager = () => {
                   size={18}
                   onPress={() => handleToggleStatus(item.id)}
                   style={styles.iconButton}
-                  iconColor={item.status === 'active' ? colors.light.primary : colors.light.textSecondary}
+                  iconColor={item.status === 'active' ? theme.colors.primary : theme.colors.onSurfaceVariant}
                 />
                 <IconButton
                   icon="pencil"

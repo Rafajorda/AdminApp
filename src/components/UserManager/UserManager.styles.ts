@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
@@ -13,17 +12,17 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchBar: {
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     marginBottom: 12,
     elevation: 2,
   },
   searchbar: {
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     marginBottom: 12,
     elevation: 2,
   },
   totalText: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     fontSize: 14,
   },
   statsRow: {
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   count: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   listContent: {
     paddingBottom: 80,
@@ -44,19 +43,19 @@ export const styles = StyleSheet.create({
     marginVertical: 12,
   },
   paginationText: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   pageText: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   userCard: {
     marginBottom: 8,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     elevation: 2,
   },
   itemCard: {
     marginBottom: 8,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     elevation: 2,
     borderRadius: 8,
     padding: 12,
@@ -94,16 +93,16 @@ export const styles = StyleSheet.create({
   youBadge: {
     fontWeight: '400',
     fontSize: 12,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   userEmail: {
     fontSize: 12,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 2,
   },
   email: {
     fontSize: 12,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 2,
   },
   userActions: {
@@ -126,10 +125,10 @@ export const styles = StyleSheet.create({
     lineHeight: 14,
   },
   adminChip: {
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
   userChip: {
-    backgroundColor: '#757575',
+    backgroundColor: theme.colors.onSurfaceVariant,
   },
   statusChip: {
     height: 24,
@@ -155,12 +154,12 @@ export const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     marginTop: 32,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
   fab: {
     position: 'absolute',
     right: 16,
     bottom: 16,
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
 });

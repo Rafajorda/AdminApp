@@ -1,17 +1,16 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   header: {
     padding: 16,
   },
   searchBar: {
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     marginBottom: 12,
     elevation: 2,
   },
   count: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     textAlign: 'right',
   },
 });

@@ -6,13 +6,12 @@
  */
 
 import React from 'react';
-import { Chip } from 'react-native-paper';
+import { Chip, useTheme } from 'react-native-paper';
 import { getOrderStatusConfig } from '../../../utils/orderStatus';
 import { styles } from './OrderStatusChip.styles';
 
 interface OrderStatusChipProps {
   status: string;
-  isDark?: boolean;
   compact?: boolean;
 }
 
@@ -20,11 +19,11 @@ interface OrderStatusChipProps {
  * Chip de estado de pedido
  * 
  * @param status - Estado del pedido ('pending', 'processing', 'shipped', 'completed', 'cancelled')
- * @param isDark - Si está en modo oscuro
  * @param compact - Si debe ser compacto (menor altura)
  */
-export const OrderStatusChip = ({ status, isDark = false, compact = true }: OrderStatusChipProps) => {
-  const config = getOrderStatusConfig(status, isDark);
+export const OrderStatusChip = ({ status, compact = true }: OrderStatusChipProps) => {
+  const theme = useTheme();
+  const config = getOrderStatusConfig(status, theme);
 
   return (
     <Chip

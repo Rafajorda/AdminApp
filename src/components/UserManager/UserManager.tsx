@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList } from 'react-native';
-import { Text, IconButton, Portal, Dialog, Chip, Button, Searchbar, FAB } from 'react-native-paper';
+import { Text, IconButton, Portal, Dialog, Chip, Button, Searchbar, FAB, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { User, UserRole } from '../../types/user';
 import { useUsersQuery, useDeleteUserMutation, useToggleUserStatusMutation } from '../../hooks/queries';
 import { useAuthStore } from '../../stores/authStore';
-import { colors } from '../../theme';
-import { styles } from './UserManager.styles';
+import { getStyles } from './UserManager.styles';
 
 export const UserManager = () => {
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
   const currentUser = useAuthStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
@@ -123,7 +124,7 @@ export const UserManager = () => {
                   icon={item.status === 'active' ? 'eye-off' : 'eye'}
                   size={18}
                   onPress={() => handleToggleStatus(item.id)}
-                  iconColor={item.status === 'active' ? colors.light.primary : colors.light.textSecondary}
+                  iconColor={item.status === 'active' ? theme.colors.primary : theme.colors.onSurfaceVariant}
                   disabled={isCurrentUser}
                   style={styles.actionButton}
                 />

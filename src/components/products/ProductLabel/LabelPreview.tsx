@@ -9,7 +9,8 @@ import { View, Text } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
-import { styles } from './LabelPreview.styles';
+import { useTheme } from 'react-native-paper';
+import { getStyles } from './LabelPreview.styles';
 
 interface LabelPreviewProps {
   product: Product;
@@ -19,6 +20,9 @@ interface LabelPreviewProps {
 
 export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
   ({ product, selectedColors, productUrl }, ref) => {
+    const theme = useTheme();
+    const styles = getStyles(theme);
+    
     return (
       <ViewShot
         ref={ref}

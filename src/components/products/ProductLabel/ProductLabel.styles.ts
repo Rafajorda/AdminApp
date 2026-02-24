@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -14,7 +13,7 @@ export const styles = StyleSheet.create({
     maxHeight: '90%',
     padding: 20,
     borderRadius: 12,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
   },
   title: {
     textAlign: 'center',

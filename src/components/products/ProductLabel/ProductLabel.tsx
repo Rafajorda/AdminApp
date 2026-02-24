@@ -6,10 +6,10 @@
 
 import React, { useRef, useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface } from 'react-native-paper';
+import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
-import { styles } from './ProductLabel.styles';
+import { getStyles } from './ProductLabel.styles';
 import { ColorSelector } from './ColorSelector';
 import { LabelPreview } from './LabelPreview';
 import { usePrintLabel } from './usePrintLabel';
@@ -22,6 +22,8 @@ interface ProductLabelProps {
 export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
   const viewShotRef = useRef<ViewShot>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   // URL que apunta al producto
   const productUrl = `myapp://product/${product.id}`;

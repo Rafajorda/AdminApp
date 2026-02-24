@@ -6,9 +6,9 @@
 
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { Text, IconButton } from 'react-native-paper';
+import { Text, IconButton, useTheme } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import { styles } from './FileUpload3D.styles';
+import { getStyles } from './FileUpload3D.styles';
 
 interface FileUpload3DProps {
   onFileSelected: (file: DocumentPicker.DocumentPickerAsset) => void;
@@ -28,6 +28,8 @@ export const FileUpload3D = ({
   isDeleting = false,
 }: FileUpload3DProps) => {
   const [uploading, setUploading] = useState(false);
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   const isProcessing = uploading || isUploading || isDeleting;
 

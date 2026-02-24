@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginVertical: 8,
@@ -23,11 +22,11 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   email: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginBottom: 2,
   },
   date: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     fontSize: 12,
   },
   headerRight: {
@@ -36,7 +35,7 @@ export const styles = StyleSheet.create({
   },
   total: {
     fontWeight: 'bold',
-    color: colors.light.primary,
+    color: theme.colors.primary,
     marginBottom: 8,
   },
   divider: {
@@ -60,14 +59,14 @@ export const styles = StyleSheet.create({
   },
   productName: {
     flex: 1,
-    color: colors.light.text,
+    color: theme.colors.onBackground,
   },
   productQuantity: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginLeft: 8,
   },
   productsPreview: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     fontStyle: 'italic',
   },
   expandButton: {

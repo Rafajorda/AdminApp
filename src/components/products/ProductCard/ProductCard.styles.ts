@@ -1,10 +1,9 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   card: {
     marginBottom: 8,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     elevation: 2,
   },
   content: {
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
     height: 50,
     borderRadius: 8,
     marginRight: 10,
-    backgroundColor: colors.light.background,
+    backgroundColor: theme.colors.background,
   },
   info: {
     flex: 1,
@@ -30,11 +29,11 @@ export const styles = StyleSheet.create({
   },
   name: {
     fontWeight: '600',
-    color: colors.light.text,
+    color: theme.colors.onBackground,
     fontSize: 14,
   },
   material: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 2,
     fontSize: 12,
   },
@@ -44,15 +43,19 @@ export const styles = StyleSheet.create({
   },
   statusChip: {
     height: 24,
+    alignItems: 'center',
   },
   activeChip: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: theme.dark ? '#1B5E20' : '#E8F5E9',
   },
   inactiveChip: {
-    backgroundColor: '#FFEBEE',
+    backgroundColor: theme.dark ? '#B71C1C' : '#FFEBEE',
   },
   chipText: {
     fontSize: 10,
+    color: theme.dark ? '#FFFFFF' : undefined,
+    fontWeight: '600',
+    lineHeight: 14,
   },
   metaRow: {
     flexDirection: 'row',
@@ -69,12 +72,12 @@ export const styles = StyleSheet.create({
   },
   categoryChip: {
     height: 24,
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
     justifyContent: 'center',
   },
   categoryText: {
     fontSize: 10,
-    color: colors.light.surface,
+    color: theme.colors.surface,
     lineHeight: 12,
   },
   colorsContainer: {
@@ -87,12 +90,12 @@ export const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     borderWidth: 1.5,
-    borderColor: colors.light.primary,
+    borderColor: theme.colors.primary,
     elevation: 1,
   },
   moreText: {
     fontSize: 10,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginLeft: 4,
   },
   actions: {

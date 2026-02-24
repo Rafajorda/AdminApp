@@ -7,11 +7,10 @@
 
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Card, Text, IconButton, Divider } from 'react-native-paper';
+import { Card, Text, IconButton, Divider, useTheme } from 'react-native-paper';
 import { Order } from '../../../types/order';
-import { colors } from '../../../theme';
 import { OrderStatusChip } from '../OrderStatusChip';
-import { styles } from './OrderCard.styles';
+import { getStyles } from './OrderCard.styles';
 
 interface OrderCardProps {
   order: Order;
@@ -22,6 +21,8 @@ interface OrderCardProps {
 
 export const OrderCard = ({ order, onViewDetails, onUpdateStatus, onDelete }: OrderCardProps) => {
   const [expanded, setExpanded] = useState(false);
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   // Formatear fecha
   const formatDate = (dateString: string | Date) => {
@@ -105,7 +106,7 @@ export const OrderCard = ({ order, onViewDetails, onUpdateStatus, onDelete }: Or
               icon="eye"
               size={18}
               onPress={() => onViewDetails(order.id)}
-              iconColor={colors.light.primary}
+              iconColor={theme.colors.primary}
             />
           )}
           {onUpdateStatus && order.status === 'pending' && (
@@ -113,14 +114,14 @@ export const OrderCard = ({ order, onViewDetails, onUpdateStatus, onDelete }: Or
               icon="check-circle"
               size={18}
               onPress={() => onUpdateStatus(order.id, 'completed')}
-              iconColor={colors.light.success || '#4CAF50'}
+              iconColor="#4CAF50"
             />
           )}
           {onDelete && (
             <IconButton
               icon="delete"
               size={18}
-              iconColor={colors.light.error}
+              iconColor={theme.colors.error}
               onPress={() => onDelete(order.id)}
             />
           )}

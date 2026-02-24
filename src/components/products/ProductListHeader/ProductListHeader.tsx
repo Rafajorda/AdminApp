@@ -6,8 +6,8 @@
 
 import React from 'react';
 import { View } from 'react-native';
-import { Searchbar, Text } from 'react-native-paper';
-import { styles } from './ProductListHeader.styles';
+import { Searchbar, Text, useTheme } from 'react-native-paper';
+import { getStyles } from './ProductListHeader.styles';
 
 interface ProductListHeaderProps {
   searchQuery: string;
@@ -20,6 +20,9 @@ export const ProductListHeader = ({
   onSearchChange, 
   totalCount 
 }: ProductListHeaderProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  
   return (
     <View style={styles.header}>
       <Searchbar

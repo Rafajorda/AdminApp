@@ -7,10 +7,9 @@
 
 import React from 'react';
 import { View, Image } from 'react-native';
-import { Card, Text, Chip, IconButton } from 'react-native-paper';
+import { Card, Text, Chip, IconButton, useTheme } from 'react-native-paper';
 import { Product } from '../../../types/product';
-import { colors } from '../../../theme';
-import { styles } from './ProductCard.styles';
+import { getStyles } from './ProductCard.styles';
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +21,8 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product, onEdit, onToggleStatus, onDelete, onGenerateLabel }: ProductCardProps) => {
   const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   return (
     <Card style={styles.card}>
@@ -51,7 +52,12 @@ export const ProductCard = ({ product, onEdit, onToggleStatus, onDelete, onGener
                 styles.statusChip,
                 product.status === 'active' ? styles.activeChip : styles.inactiveChip,
               ]}
-              textStyle={styles.chipText}
+              textStyle={[
+                styles.chipText,
+                product.status === 'active' 
+                  ? { color: theme.dark ? '#FFFFFF' : '#2E7D32' }
+                  : { color: theme.dark ? '#FFFFFF' : '#C62828' }
+              ]}
             >
               {product.status === 'active' ? 'Activo' : 'Inactivo'}
             </Chip>
@@ -105,7 +111,7 @@ export const ProductCard = ({ product, onEdit, onToggleStatus, onDelete, onGener
               icon="qrcode"
               size={18}
               onPress={() => onGenerateLabel(product)}
-              iconColor={colors.light.primary}
+              iconColor={theme.colors.primary}
             />
           )}
           <IconButton
@@ -116,7 +122,7 @@ export const ProductCard = ({ product, onEdit, onToggleStatus, onDelete, onGener
           <IconButton
             icon="delete"
             size={18}
-            iconColor={colors.light.error}
+            iconColor={theme.colors.error}
             onPress={() => onDelete(product.id, product.name)}
           />
         </View>

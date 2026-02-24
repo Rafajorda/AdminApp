@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     alignSelf: 'center',
   },
@@ -9,7 +8,7 @@ export const styles = StyleSheet.create({
     width: 500,
     height: 250,
     borderWidth: 2,
-    borderColor: colors.light.primary,
+    borderColor: theme.colors.primary,
     borderRadius: 8,
     padding: 15,
     backgroundColor: 'white',
@@ -34,7 +33,7 @@ export const styles = StyleSheet.create({
   productPrice: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: colors.light.primary,
+    color: theme.colors.primary,
     textAlign: 'center',
     marginVertical: 10,
   },

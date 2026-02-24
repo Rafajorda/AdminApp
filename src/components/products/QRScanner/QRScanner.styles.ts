@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
@@ -44,7 +43,7 @@ export const styles = StyleSheet.create({
   scanFrame: {
     width: 250,
     borderWidth: 2,
-    borderColor: colors.light.primary,
+    borderColor: theme.colors.primary,
     borderRadius: 12,
   },
   bottomOverlay: {

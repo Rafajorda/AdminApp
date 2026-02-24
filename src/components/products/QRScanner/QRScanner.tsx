@@ -6,10 +6,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Alert } from 'react-native';
-import { Text, Button, Surface, IconButton } from 'react-native-paper';
+import { Text, Button, Surface, IconButton, useTheme } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
-import { styles } from './QRScanner.styles';
+import { getStyles } from './QRScanner.styles';
 
 interface QRScannerProps {
   onClose: () => void;
@@ -19,6 +19,8 @@ export const QRScanner = ({ onClose }: QRScannerProps) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const router = useRouter();
+  const theme = useTheme();
+  const styles = getStyles(theme);
 
   /**
    * Maneja el escaneo del QR

@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../theme';
 
-export const styles = StyleSheet.create({
+export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -30,11 +29,11 @@ export const styles = StyleSheet.create({
     marginBottom: 6,
   },
   itemCard: {
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: theme.colors.outline,
     flex: 1,
     marginHorizontal: 3,
   },
@@ -56,10 +55,10 @@ export const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.colors.outline,
   },
   hexCode: {
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
     marginTop: 2,
   },
   itemActions: {
@@ -72,6 +71,6 @@ export const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     marginTop: 32,
-    color: colors.light.textSecondary,
+    color: theme.colors.onSurfaceVariant,
   },
 });
