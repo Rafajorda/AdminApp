@@ -6,8 +6,6 @@
  * - Obtener colores de estados desde el tema
  */
 
-import { colors } from '../theme';
-
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
 
 /**
@@ -43,47 +41,46 @@ export function getOrderStatusText(status: string): string {
  * Obtiene la configuración completa de un estado
  * (colores desde el tema + texto)
  */
-export function getOrderStatusConfig(status: string, isDark = false): OrderStatusConfig {
-  const theme = isDark ? colors.dark : colors.light;
+export function getOrderStatusConfig(status: string, theme: any): OrderStatusConfig {
   const text = getOrderStatusText(status);
 
   switch (status) {
     case 'pending':
       return {
         text,
-        backgroundColor: theme.orderStatus.pending.background,
-        textColor: theme.orderStatus.pending.text,
+        backgroundColor: '#FFF3E0',
+        textColor: '#E65100',
       };
     case 'processing':
       return {
         text,
-        backgroundColor: theme.orderStatus.processing.background,
-        textColor: theme.orderStatus.processing.text,
+        backgroundColor: '#E3F2FD',
+        textColor: '#1976D2',
       };
     case 'shipped':
       return {
         text,
-        backgroundColor: theme.orderStatus.shipped.background,
-        textColor: theme.orderStatus.shipped.text,
+        backgroundColor: '#F3E5F5',
+        textColor: '#7B1FA2',
       };
     case 'completed':
       return {
         text,
-        backgroundColor: theme.orderStatus.completed.background,
-        textColor: theme.orderStatus.completed.text,
+        backgroundColor: '#E8F5E9',
+        textColor: '#2E7D32',
       };
     case 'cancelled':
       return {
         text,
-        backgroundColor: theme.orderStatus.cancelled.background,
-        textColor: theme.orderStatus.cancelled.text,
+        backgroundColor: '#FFEBEE',
+        textColor: '#C62828',
       };
     default:
-      // Estado desconocido usa colores neutros
+      // Estado desconocido usa colores neutros del tema
       return {
         text: status,
-        backgroundColor: '#F5F5F5',
-        textColor: '#757575',
+        backgroundColor: theme.colors.surface,
+        textColor: theme.colors.onSurfaceVariant,
       };
   }
 }
