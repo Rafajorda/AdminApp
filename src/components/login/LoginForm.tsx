@@ -46,9 +46,7 @@ import React from 'react'; // Biblioteca principal de React
 // ===== IMPORTS DE REACT NATIVE =====
 import { View, StyleSheet } from 'react-native'; // Componentes básicos
 // ===== IMPORTS DE REACT NATIVE PAPER =====
-import { TextInput, Button, HelperText } from 'react-native-paper'; // Componentes MD3
-// ===== IMPORTS DE TEMA =====
-import { colors } from '../../theme'; // Colores de la aplicación (TODO: usar tema dinámico)
+import { TextInput, Button, HelperText, useTheme } from 'react-native-paper'; // Componentes MD3
 
 /**
  * Props del componente LoginForm
@@ -61,7 +59,7 @@ interface LoginFormProps {
   showPassword: boolean; // Control de visibilidad de la contraseña
   emailError: string | null; // Mensaje de error del email (null si no hay error)
   isLoading: boolean; // Estado de carga durante autenticación
-  isFormValid: boolean | string; // Indica si el formulario es válido para enviar
+  isFormValid: boolean; // Indica si el formulario es válido para enviar
   onEmailChange: (text: string) => void; // Callback para cambio en el campo email
   onPasswordChange: (text: string) => void; // Callback para cambio en el campo password
   onTogglePassword: () => void; // Callback para toggle de visibilidad de password
@@ -91,6 +89,9 @@ export const LoginForm = ({
   onSubmit, // Handler de submit
   onForgotPassword, // Handler de olvidé mi contraseña
 }: LoginFormProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     // Contenedor del formulario
     <View style={styles.form}>
@@ -173,10 +174,9 @@ export const LoginForm = ({
 
 /**
  * Estilos del componente LoginForm
- * 
- * TODO: Migrar a getStyles(theme) para soporte de tema dinámico
+ * Usa el tema dinámico para soportar modo claro/oscuro
  */
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   // ===== CONTENEDOR DEL FORMULARIO =====
   form: {
     width: '100%', // Ancho completo
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   // ===== INPUTS (EMAIL Y PASSWORD) =====
   input: {
     marginBottom: 4, // Pequeña separación con el HelperText
-    backgroundColor: colors.light.surface, // Fondo color surface
+    backgroundColor: theme.colors.surface, // Fondo color surface
   },
   
   // ===== BOTÓN "OLVIDÉ MI CONTRASEÑA" =====
@@ -196,13 +196,13 @@ const styles = StyleSheet.create({
     marginBottom: 24, // Separación con el botón de login
   },
   forgotButtonLabel: {
-    color: colors.light.primary, // Texto color primario
+    color: theme.colors.primary, // Texto color primario
     fontSize: 14, // Tamaño medio
   },
   
   // ===== BOTÓN "INICIAR SESIÓN" =====
   loginButton: {
-    backgroundColor: colors.light.primary, // Fondo color primario
+    backgroundColor: theme.colors.primary, // Fondo color primario
   },
   loginButtonContent: {
     paddingVertical: 8, // Padding vertical para altura

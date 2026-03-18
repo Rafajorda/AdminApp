@@ -5,7 +5,7 @@
  */
 
 import React, { forwardRef } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
@@ -18,6 +18,11 @@ interface LabelPreviewProps {
   productUrl: string;
 }
 
+// Calcular tamaño del QR de forma consistente con los estilos
+const { width: screenWidth } = Dimensions.get('window');
+const labelWidth = Math.min(screenWidth * 0.9, 500);
+const qrSize = Math.min(labelWidth * 0.26, 130);
+
 export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
   ({ product, selectedColors, productUrl }, ref) => {
     const theme = useTheme();
@@ -29,13 +34,14 @@ export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
         options={{ format: 'png', quality: 1.0 }}
         style={styles.container}
       >
-        <View style={styles.label}>
+        <View style={styles.label} collapsable={false}>
           {/* Código QR (izquierda) */}
-          <View style={styles.qrSection}>
+          <View style={styles.qrSection} collapsable={false}>
             <QRCode
               value={productUrl}
-              size={130}
+              size={qrSize}
               backgroundColor="white"
+              color="#000000"
             />
           </View>
 

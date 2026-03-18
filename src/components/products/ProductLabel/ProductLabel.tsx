@@ -47,7 +47,11 @@ export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
           Vista previa de etiqueta
         </Text>
         
-        <ScrollView style={styles.scrollContainer}>
+        <ScrollView 
+          style={styles.scrollContainer}
+          contentContainerStyle={{ alignItems: 'center', paddingVertical: 10 }}
+          showsVerticalScrollIndicator={true}
+        >
           {/* Selector de colores */}
           {product.colors && product.colors.length > 0 && (
             <ColorSelector

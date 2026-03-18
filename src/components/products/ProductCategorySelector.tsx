@@ -6,8 +6,7 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Chip, HelperText, Divider } from 'react-native-paper';
-import { colors } from '../../theme';
+import { Text, Chip, HelperText, Divider, useTheme } from 'react-native-paper';
 import { Category } from '../../types/product';
 
 interface ProductCategorySelectorProps {
@@ -23,6 +22,9 @@ export const ProductCategorySelector = ({
   error,
   onToggle,
 }: ProductCategorySelectorProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     <View>
       <Divider style={styles.divider} />
@@ -55,7 +57,7 @@ export const ProductCategorySelector = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   divider: {
     marginVertical: 20,
   },
@@ -63,6 +65,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 12,
     fontWeight: 'bold',
+    color: theme.colors.onBackground,
   },
   chipContainer: {
     flexDirection: 'row',
@@ -74,9 +77,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   chipSelected: {
-    backgroundColor: colors.light.primary,
+    backgroundColor: theme.colors.primary,
   },
   chipSelectedText: {
-    color: colors.light.surface,
+    color: theme.colors.onPrimary,
   },
 });

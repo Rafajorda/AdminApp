@@ -6,8 +6,7 @@
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, HelperText, Text } from 'react-native-paper';
-import { colors } from '../../theme';
+import { TextInput, HelperText, Text, useTheme } from 'react-native-paper';
 import { CreateProductInput } from '../../types/product';
 
 interface ProductBasicFieldsProps {
@@ -21,6 +20,9 @@ export const ProductBasicFields = ({
   fieldErrors,
   onFieldChange,
 }: ProductBasicFieldsProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     <View>
       <Text variant="titleMedium" style={styles.sectionTitle}>
@@ -123,14 +125,15 @@ export const ProductBasicFields = ({
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   sectionTitle: {
     marginTop: 8,
     marginBottom: 12,
     fontWeight: 'bold',
+    color: theme.colors.onBackground,
   },
   input: {
     marginBottom: 4,
-    backgroundColor: colors.light.surface,
+    backgroundColor: theme.colors.surface,
   },
 });

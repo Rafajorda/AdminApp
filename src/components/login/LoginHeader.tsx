@@ -29,9 +29,7 @@ import React from 'react'; // Biblioteca principal de React
 // ===== IMPORTS DE REACT NATIVE =====
 import { View, StyleSheet } from 'react-native'; // Componentes básicos
 // ===== IMPORTS DE REACT NATIVE PAPER =====
-import { Text } from 'react-native-paper'; // Texto con variantes MD3
-// ===== IMPORTS DE TEMA =====
-import { colors } from '../../theme'; // Colores de la aplicación (TODO: usar tema dinámico)
+import { Text, useTheme } from 'react-native-paper'; // Texto con variantes MD3
 
 /**
  * Componente LoginHeader
@@ -42,6 +40,9 @@ import { colors } from '../../theme'; // Colores de la aplicación (TODO: usar t
  * @returns {JSX.Element} Header con logo y títulos
  */
 export const LoginHeader = () => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
   return (
     // Contenedor principal centrado
     <View style={styles.header}>
@@ -74,10 +75,9 @@ export const LoginHeader = () => {
 
 /**
  * Estilos del componente LoginHeader
- * 
- * TODO: Migrar a getStyles(theme) para soporte de tema dinámico
+ * Usa el tema dinámico para soportar modo claro/oscuro
  */
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   // ===== CONTENEDOR PRINCIPAL =====
   header: {
     alignItems: 'center', // Centrar todo horizontalmente
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     width: 100, // Ancho del círculo
     height: 100, // Alto del círculo
     borderRadius: 50, // Radio para hacerlo circular (mitad del ancho)
-    backgroundColor: colors.light.primary, // Fondo color primario
+    backgroundColor: theme.colors.primary, // Fondo color primario
     justifyContent: 'center', // Centrar verticalmente
     alignItems: 'center', // Centrar horizontalmente
     marginBottom: 24, // Separación con el título
@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
   // ===== TÍTULO "ADMIN PANEL" =====
   title: {
     fontWeight: 'bold', // Texto en negrita
-    color: colors.light.text, // Color de texto principal
+    color: theme.colors.onBackground, // Color de texto principal
     marginBottom: 8, // Separación con el subtítulo
   },
   
   // ===== SUBTÍTULO "INICIA SESIÓN..." =====
   subtitle: {
-    color: colors.light.textSecondary, // Color de texto secundario (más tenue)
+    color: theme.colors.onSurfaceVariant, // Color de texto secundario (más tenue)
   },
 });

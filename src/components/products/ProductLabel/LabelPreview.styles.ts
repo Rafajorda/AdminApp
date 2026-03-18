@@ -1,12 +1,22 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width: screenWidth } = Dimensions.get('window');
+// Calcular ancho de la etiqueta: 90% del ancho de pantalla, máximo 500px
+const labelWidth = Math.min(screenWidth * 0.9, 500);
+// Altura proporcional: mantener aspecto 2:1 (ancho:alto)
+const labelHeight = labelWidth / 2;
+// QR size: ~30% del ancho de la etiqueta
+const qrSize = Math.min(labelWidth * 0.26, 130);
 
 export const getStyles = (theme: any) => StyleSheet.create({
   container: {
     alignSelf: 'center',
+    width: '100%',
+    alignItems: 'center',
   },
   label: {
-    width: 500,
-    height: 250,
+    width: labelWidth,
+    height: labelHeight,
     borderWidth: 2,
     borderColor: theme.colors.primary,
     borderRadius: 8,
@@ -15,7 +25,7 @@ export const getStyles = (theme: any) => StyleSheet.create({
     flexDirection: 'row',
   },
   qrSection: {
-    width: 150,
+    width: qrSize + 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -25,28 +35,28 @@ export const getStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'space-between',
   },
   productName: {
-    fontSize: 20,
+    fontSize: labelWidth > 400 ? 20 : 16,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   productPrice: {
-    fontSize: 36,
+    fontSize: labelWidth > 400 ? 36 : 28,
     fontWeight: 'bold',
     color: theme.colors.primary,
     textAlign: 'center',
-    marginVertical: 10,
+    marginVertical: 8,
   },
   productDescription: {
-    fontSize: 11,
+    fontSize: labelWidth > 400 ? 11 : 10,
     color: '#444',
-    lineHeight: 16,
-    marginBottom: 8,
+    lineHeight: labelWidth > 400 ? 16 : 14,
+    marginBottom: 6,
   },
   productDetails: {
-    fontSize: 11,
+    fontSize: labelWidth > 400 ? 11 : 10,
     color: '#666',
-    marginBottom: 5,
+    marginBottom: 4,
   },
   colorsSection: {
     marginTop: 8,

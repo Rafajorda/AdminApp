@@ -4,7 +4,7 @@
  * Hook para manejar la lógica de impresión de etiquetas
  */
 
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import * as Print from 'expo-print';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
@@ -19,14 +19,29 @@ interface UsePrintLabelProps {
 export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrintLabelProps) => {
   const handlePrint = async () => {
     try {
-      if (!viewShotRef.current) return;
+      let qrImageUri: string;
+      const productUrl = `myapp://product/${product.id}`;
 
-      // Capturar la vista como imagen
-      const uri = await viewShotRef.current.capture?.();
-      
-      if (!uri) {
-        Alert.alert('Error', 'No se pudo generar la etiqueta');
-        return;
+      // En web, usar API externa para generar QR
+      // En mobile/tablet, capturar la vista
+      if (Platform.OS === 'web') {
+        // Usar servicio de QR code online para web
+        qrImageUri = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(productUrl)}`;
+      } else {
+        // En mobile/tablet, capturar la vista como antes
+        if (!viewShotRef.current) {
+          Alert.alert('Error', 'No se pudo acceder a la vista');
+          return;
+        }
+
+        const uri = await viewShotRef.current.capture?.();
+        
+        if (!uri) {
+          Alert.alert('Error', 'No se pudo generar la etiqueta');
+          return;
+        }
+        
+        qrImageUri = uri;
       }
 
       // Generar HTML de colores
@@ -49,6 +64,12 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
           <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              
               body {
                 margin: 0;
                 padding: 20px;
@@ -56,7 +77,16 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
                 justify-content: center;
                 align-items: center;
                 font-family: Arial, sans-serif;
+                min-height: 100vh;
               }
+              
+              @media print {
+                body {
+                  padding: 0;
+                  margin: 0;
+                }
+              }
+              
               .label {
                 width: 500px;
                 height: 250px;
@@ -66,6 +96,7 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
                 background: white;
                 display: flex;
                 flex-direction: row;
+                page-break-inside: avoid;
               }
               .qr-section {
                 width: 150px;
@@ -118,11 +149,11 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
           <body>
             <div class="label">
               <div class="qr-section">
-                <img src="${uri}" width="130" height="130" />
+                <img src="${qrImageUri}" width="130" height="130" />
               </div>
               <div class="info-section">
                 <div class="product-name">${product.name}</div>
-                <div class="product-price">€${product.price.toFixed(2)}</div>
+                <div class="product-price">€${Number(product.price || 0).toFixed(2)}</div>
                 ${product.description ? `<div class="product-description">${product.description}</div>` : ''}
                 ${product.dimensions ? `<div class="product-details">Tamaño: ${product.dimensions}</div>` : ''}
                 ${colorsHtml ? `<div class="colors-section"><strong style="font-size: 11px; margin-right: 8px;">Colores:</strong>${colorsHtml}</div>` : ''}
@@ -132,12 +163,43 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
         </html>
       `;
 
-      // Imprimir
-      await Print.printAsync({
-        html,
-        width: 500,
-        height: 250,
-      });
+      // Imprimir según la plataforma
+      if (Platform.OS === 'web') {
+        // En web: abrir ventana emergente con el HTML y llamar a window.print()
+        if (typeof globalThis !== 'undefined' && (globalThis as any).window) {
+          const printWindow = (globalThis as any).window.open('', '_blank', 'width=600,height=400');
+          if (printWindow) {
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            // Esperar a que la imagen del QR cargue antes de imprimir
+            printWindow.onload = () => {
+              setTimeout(() => {
+                printWindow.print();
+                // Cerrar la ventana después de imprimir (opcional)
+                // printWindow.close();
+              }, 250);
+            };
+          } else {
+            Alert.alert('Error', 'No se pudo abrir la ventana de impresión. Verifica que los pop-ups estén permitidos.');
+          }
+        } else {
+          // Fallback a expo-print si no hay acceso a window
+          await Print.printAsync({
+            html,
+            width: 500,
+            height: 250,
+          });
+        }
+      } else {
+        // En mobile/tablet: usar expo-print
+        await Print.printAsync({
+          html,
+          width: 500,
+          height: 250,
+        });
+      }
 
       console.log('[ProductLabel] Etiqueta enviada a imprimir');
     } catch (error) {

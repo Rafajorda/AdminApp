@@ -28,10 +28,10 @@ const EntitiesDashboardScreen = () => {
         style={styles.segmentedButtons}
       />
 
-      <ScrollView style={styles.content}>
+      <View style={styles.content}>
         {selectedEntity === 'categories' && <CategoryManager />}
         {selectedEntity === 'colors' && <ColorManager />}
-      </ScrollView>
+      </View>
     </View>
   );
 };
