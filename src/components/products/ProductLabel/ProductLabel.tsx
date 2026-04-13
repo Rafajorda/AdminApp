@@ -4,10 +4,9 @@
  * Genera una etiqueta/pegatina imprimible del producto
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
-import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
 import { getStyles } from './ProductLabel.styles';
 import { ColorSelector } from './ColorSelector';
@@ -20,7 +19,6 @@ interface ProductLabelProps {
 }
 
 export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
-  const viewShotRef = useRef<ViewShot>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -29,7 +27,7 @@ export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
   const productUrl = `myapp://product/${product.id}`;
 
   // Hook para imprimir
-  const { handlePrint } = usePrintLabel({ product, selectedColors, viewShotRef });
+  const { handlePrint } = usePrintLabel({ product, selectedColors });
 
   // Toggle de selección de color
   const toggleColor = (colorName: string) => {
@@ -63,7 +61,6 @@ export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
 
           {/* Vista previa de la etiqueta */}
           <LabelPreview
-            ref={viewShotRef}
             product={product}
             selectedColors={selectedColors}
             productUrl={productUrl}

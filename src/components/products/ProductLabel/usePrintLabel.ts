@@ -6,43 +6,20 @@
 
 import { Alert, Platform } from 'react-native';
 import * as Print from 'expo-print';
-import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
 import { colors } from '../../../theme';
 
 interface UsePrintLabelProps {
   product: Product;
   selectedColors: string[];
-  viewShotRef: React.RefObject<ViewShot | null>;
 }
 
-export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrintLabelProps) => {
+export const usePrintLabel = ({ product, selectedColors }: UsePrintLabelProps) => {
   const handlePrint = async () => {
     try {
-      let qrImageUri: string;
       const productUrl = `myapp://product/${product.id}`;
-
-      // En web, usar API externa para generar QR
-      // En mobile/tablet, capturar la vista
-      if (Platform.OS === 'web') {
-        // Usar servicio de QR code online para web
-        qrImageUri = `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(productUrl)}`;
-      } else {
-        // En mobile/tablet, capturar la vista como antes
-        if (!viewShotRef.current) {
-          Alert.alert('Error', 'No se pudo acceder a la vista');
-          return;
-        }
-
-        const uri = await viewShotRef.current.capture?.();
-        
-        if (!uri) {
-          Alert.alert('Error', 'No se pudo generar la etiqueta');
-          return;
-        }
-        
-        qrImageUri = uri;
-      }
+      // Usar una URL HTTPS del QR para asegurar compatibilidad en el motor de impresión móvil.
+      const qrImageUri = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodeURIComponent(productUrl)}`;
 
       // Generar HTML de colores
       const colorsHtml = product.colors && product.colors.length > 0
