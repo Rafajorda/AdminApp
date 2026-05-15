@@ -5,7 +5,7 @@
  */
 
 import React, { useRef, useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, useWindowDimensions } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
@@ -22,6 +22,8 @@ interface ProductLabelProps {
 export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
   const viewShotRef = useRef<ViewShot>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const { width: screenWidth } = useWindowDimensions();
+  const isTablet = screenWidth >= 768;
   const theme = useTheme();
   const styles = getStyles(theme);
 
@@ -32,11 +34,11 @@ export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
   const { handlePrint } = usePrintLabel({ product, selectedColors, viewShotRef });
 
   // Toggle de selección de color
-  const toggleColor = (colorName: string) => {
+  const toggleColor = (colorId: string) => {
     setSelectedColors(prev => 
-      prev.includes(colorName)
-        ? prev.filter(c => c !== colorName)
-        : [...prev, colorName]
+      prev.includes(colorId)
+        ? prev.filter(c => c !== colorId)
+        : [...prev, colorId]
     );
   };
 
@@ -49,25 +51,32 @@ export const ProductLabel = ({ product, onClose }: ProductLabelProps) => {
         
         <ScrollView 
           style={styles.scrollContainer}
-          contentContainerStyle={{ alignItems: 'center', paddingVertical: 10 }}
+          contentContainerStyle={[
+            styles.scrollContent,
+            isTablet && styles.scrollContentTablet,
+          ]}
           showsVerticalScrollIndicator={true}
         >
+          <View style={styles.previewBlock}>
+            {/* Vista previa de la etiqueta */}
+            <LabelPreview
+              ref={viewShotRef}
+              product={product}
+              selectedColors={selectedColors}
+              productUrl={productUrl}
+            />
+          </View>
+
           {/* Selector de colores */}
           {product.colors && product.colors.length > 0 && (
-            <ColorSelector
-              colors={product.colors}
-              selectedColors={selectedColors}
-              onToggleColor={toggleColor}
-            />
+            <View style={styles.selectorBlock}>
+              <ColorSelector
+                colors={product.colors}
+                selectedColors={selectedColors}
+                onToggleColor={toggleColor}
+              />
+            </View>
           )}
-
-          {/* Vista previa de la etiqueta */}
-          <LabelPreview
-            ref={viewShotRef}
-            product={product}
-            selectedColors={selectedColors}
-            productUrl={productUrl}
-          />
         </ScrollView>
 
         {/* Acciones */}
